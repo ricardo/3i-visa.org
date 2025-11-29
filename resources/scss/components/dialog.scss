@@ -1,0 +1,164 @@
+@use "../mixins" as *;
+@use "../animations/fade-in-top" as fadeInTop;
+@use "../animations/fade-in" as fadeIn;
+@use "../animations/fade-out" as fadeOut;
+@use "../animations/slide-up" as slideUp;
+
+// Dialog.
+dialog {
+	--background: rgba( 0, 0, 0, .8 );
+	transition: .3s !important;
+
+	&[open] {
+		backdrop-filter: blur( 0px );
+		background: var( --background );
+
+		animation-name: fadeIn;
+		animation-timing-function: ease-out;
+		animation-duration: .2s;
+		animation-fill-mode: forwards;
+
+		&.shallow {
+			backdrop-filter: blur( 0px );
+			background: rgba( 0, 0, 0, .6 );
+		}
+
+		&.mid {
+			backdrop-filter: blur( 4px );
+			background: rgba( 0, 0, 0, .7 );
+		}
+
+		&.floating {
+			align-items: center;
+
+			article {
+				border-radius: calc( var( --3i-border-radius ) * 2 );
+			}
+		}
+	}
+
+	&.is-closing {
+		pointer-events: none;
+		animation: fadeOut .3s forwards;
+
+		article {
+			translate: 0 20px;
+			scale: .98;
+			transition: translate .3s ease, scale .3s ease;
+		}
+	}
+
+	/* Mobile sheet: slide the whole dialog down while fading */
+	@include respond-to( sm ) {
+		align-items: flex-end;
+
+		&.is-closing {
+			animation: fadeOut .3s forwards;
+
+			article {
+				transition: .3s !important;
+				transform: translateY( 100% ) !important;
+			}
+		}
+	}
+
+	article {
+		position: relative;
+		padding: 2.5rem 3rem;
+		text-align: center;
+		border-radius: calc( var( --3i-border-radius ) * 2 );
+		border: 1px solid var( --3i-layout-border-color );
+		border-top: 1px solid var( --3i-dialog-border-rgba );
+		background-color: white !important;
+
+		// Se o navegador suporta OKLCH, usa as cores melhores.
+		@supports ( color: oklch( 50% 0 0 ) ) {
+			background: var( --3i-dialog-background-oklch );
+			border-top-color: var( --3i-dialog-border-oklch );
+		}
+
+		animation-name: fadeInTop;
+		animation-timing-function: ease-out;
+		animation-duration: .2s;
+		animation-fill-mode: forwards;
+
+		&.draggable {
+			// Prevent text selection while dragging.
+			@include no-select;
+			@include no-user-drag;
+
+			overscroll-behavior-y: contain;
+		}
+
+		&.small {
+			max-width: 500px;
+		}
+
+		&.medium {
+			max-width: 700px;
+		}
+
+		&.large {
+			max-width: 900px;
+		}
+
+		.close {
+			position: absolute;
+			top: 1rem;
+			right: 1rem;
+			margin-top: 0;
+			margin-bottom: 0;
+			background-image: none;
+			opacity: 1;
+
+			&:before {
+				content: '×';
+				line-height: 1.8rem;
+				font-size: 1.3rem;
+				color: var( --3i-h1-color );
+			}
+		}
+
+		.handle {
+			display: none;
+			position: absolute;
+			top: 20px;
+			left: 50%;
+			transform: translateX( -50% );
+			width: 50px;
+			height: 3px;
+			background: var( --3i-h1-color );
+			opacity: .6;
+			border-radius: 2px;
+		}
+
+		h2 {
+			font-size: 1.4rem;
+		}
+
+		a[role="button"], button {
+			width: 100%;
+		}
+
+		@include respond-to( sm ) {
+			width: 100%;
+			max-width: 100%;
+			margin: 0;
+			border-radius: calc( var( --3i-border-radius ) * 3 ) calc( var( --3i-border-radius ) * 3 ) 0 0;
+			padding: 3rem 2rem 2.2rem 2rem;
+			border: 0px solid transparent;
+			border-top: 1px solid var( --3i-dialog-border-rgba );
+
+			// Different animation on mobile.
+			animation-name: slideUp;
+
+			.close {
+				display: none;
+			}
+
+			.handle {
+				display: block;
+			}
+		}
+	}
+}

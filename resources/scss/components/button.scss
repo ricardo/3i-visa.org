@@ -1,0 +1,23 @@
+a[role="button"], button, button[role="button"], button[type="submit"], summary[role="button"] {
+	--3i-font-weight: 600;
+	font-size: .9rem;
+	border-width: 1.5px;
+	border-radius: 1.44rem;
+	padding: calc( var( --3i-form-element-spacing-vertical ) * 1.05 ) var( --3i-form-element-spacing-horizontal );
+
+	&.outline:hover {
+		outline: .8px solid !important;
+	}
+
+	&.vendor-login-button {
+		svg {
+			margin-right: .5rem;
+		}
+	}
+
+	&.flex {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+}

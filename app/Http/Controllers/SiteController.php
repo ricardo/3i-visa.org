@@ -1,0 +1,45 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
+
+class SiteController extends Controller {
+
+	public function getHomePage() {
+		return view( 'pages.home' );
+	}
+
+	public function postSwitchLanguage( Request $request ) {
+		$new_locale = $request->input( 'locale' );
+		$supported_locales = array_keys( config( 'app.supported_locales' ) );
+
+		// Validate new locale.
+		if ( ! in_array( $new_locale, $supported_locales ) ) {
+			return redirect()->back();
+		}
+
+		// Update cookie if not a bot.
+		if ( ! is_crawler_bot( $request ) ) {
+			$minutes = 60 * 24 * 180; // 180 days.
+
+			Cookie::queue( 'preferred_locale', $new_locale, $minutes );
+			Cookie::queue( 'preferred_locale_src', 'manual', $minutes );
+			// Optional: keep a timestamp, useful if you later want to compare recency.
+			Cookie::queue( 'preferred_locale_ts', (string) now()->timestamp, $minutes );
+		}
+
+		// Get the current path without locale.
+		$current_path = get_current_path_without_locale( route( $request->input( 'current_route' ) ) );
+		$new_url      = get_localized_url( $new_locale, $current_path );
+
+		// Add locale to user's profile if logged in.
+		$user = auth()->check() ? auth()->user() : null;
+		if ( $user && $user->locale !== $new_locale ) {
+			$user->update( [ 'locale' => $new_locale ] );
+		}
+
+		return redirect( $new_url );
+	}
+}

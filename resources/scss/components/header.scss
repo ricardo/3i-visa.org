@@ -1,0 +1,172 @@
+@use "../mixins" as *;
+
+body > header {
+	transition: box-shadow .4s ease-in-out;
+	background-color: var( --3i-header-background );
+	border-bottom: 1px solid transparent;
+	padding: .72rem 0;
+	border-bottom: 1px solid var( --3i-border-color );
+
+	// Sticky.
+	position: sticky;
+	top: 0;
+	backdrop-filter: blur( 1rem );
+	z-index: 100;
+
+	.container {
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.avatar {
+		display: flex;
+		justify-content: flex-end;
+		margin: .3rem 0 .3rem .7rem;
+	}
+
+	.logo {
+		flex: 1;
+		align-items: center;
+		justify-content: flex-start;
+	}
+
+	.header-button {
+		padding: .22rem .88rem;
+		font-size: .88rem;
+	}
+
+	.translate-button {
+		display: inline-flex;
+		align-items: center;
+
+		svg {
+			width: .88rem !important;
+			height: .88rem !important;
+			margin-left: .25rem;
+		}
+	}
+
+	nav {
+		ul li {
+			font-weight: 500;
+			padding: 0 calc( var( --3i-nav-element-spacing-horizontal ) * .9 );
+
+			a:hover {
+				text-decoration: none;
+			}
+		}
+
+		&.dashboard {
+			display: none;
+		}
+
+		@include respond-to(md) {
+			display: none;
+			top: 50px;
+		}
+
+		&.open {
+			display: block;
+			position: absolute;
+			top: 60px;
+			right: 0;
+			width: 100%;
+			max-width: 400px;
+			padding: calc( var( --3i-spacing ) * 1.5 ) calc( var( --3i-spacing ) * 2 );
+			box-shadow: var(--3i-card-box-shadow);
+			border-radius: .5rem;
+			animation: fadeIn .3s;
+			z-index: 100;
+
+			&.dashboard {
+				width: 250px;
+				padding: calc( var( --3i-spacing ) * 1 );// calc( var( --3i-spacing ) * 2 );
+			}
+
+			ul {
+				display: flex;
+				flex-direction: column;
+				align-items: flex-start;
+				justify-content: flex-start;
+				height: 100%;
+				padding: 0;
+				margin: 0;
+
+				li, a {
+					width: 100%;
+				}
+			}
+
+			@include respond-to(sm) {
+				max-width: 100%;
+				top: 48px;
+			}
+		}
+	}
+
+	@keyframes fadeIn {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+}
+
+.nav-toggle {
+	display: none;
+	border: none;
+    background: none;
+	padding: var( --3i-form-element-spacing-vertical ) calc( var( --3i-form-element-spacing-horizontal ) / 4 );
+    cursor: pointer;
+
+	&.sidebar {
+		margin-left: -4px;
+
+		@include respond-to( lg ) {
+			display: block;
+		}
+
+		span:nth-child( 2 ) {
+			width: 16px;
+		}
+	}
+
+	span {
+		display: block;
+		width: 22px;
+		height: 2px;
+		margin: 4px;
+		border-radius: 1px;
+		background-color: var(--3i-h1-color);
+		transition: var(--3i-transition);
+	}
+
+	@include respond-to(md) {
+		display: block;
+	}
+
+	&.open {
+		span {
+			opacity: .5;
+		}
+	}
+}
+
+.user-avatar {
+	display: block;
+	width: 35px !important;
+	height: 35px !important;
+	border-radius: 50%;
+	padding: 0;
+	cursor: pointer;
+
+	@include respond-to( md ) {
+		width: 32px;
+		height: 32px;
+	}
+}
+

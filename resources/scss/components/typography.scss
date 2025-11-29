@@ -1,0 +1,20 @@
+h1, h2, h3 {
+	font-weight: 800;
+}
+
+.fs {
+	&-0 { font-size: 0.65rem !important; }
+	&-1 { font-size: 0.8rem !important; }
+	&-2 { font-size: .9rem !important; }
+	&-3 { font-size: 1rem !important; }
+	&-4 { font-size: 1.2rem !important; }
+	&-5 { font-size: 1.3rem !important; }
+}
+
+.color-muted {
+	color: var( --3i-muted-color );
+
+	&:is(a) {
+		text-decoration-color: var( --3i-muted-color );
+	}
+}

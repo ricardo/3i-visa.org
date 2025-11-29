@@ -1,0 +1,14 @@
+input:not([type=checkbox], [type=radio]), select, textarea, details.dropdown summary {
+	border-radius: 1.44rem;
+	border: 2px solid var( --3i-border-color );
+	font-size: .95rem !important;
+
+	&:hover {
+		box-shadow: 2px red;
+	}
+
+	// Change placeholder color.
+	&::placeholder {
+		color: var( --3i-muted-color );
+	}
+}
