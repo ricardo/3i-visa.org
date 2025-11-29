@@ -1,0 +1,108 @@
+@use "@picocss/pico/scss/colors" as *;
+@use "../mixins" as *;
+
+section.hero {
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+	row-gap: calc( var( --3i-spacing ) * 1 );
+	margin-top: calc( var( --3i-spacing ) * 3.2 );
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+
+	.particle-container {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: -1;
+		pointer-events: none;
+		user-select: none;
+		overflow: hidden;
+	}
+
+	.particle {
+		position: absolute;
+		font-size: 30px;
+		font-weight: bold;
+		animation: pulse .3s ease-in;
+
+		&.fade {
+			opacity: 0;
+			transition: opacity 2s;
+		}
+	}
+
+	@keyframes pulse {
+		0% {
+			transform: scale( 0 );
+			opacity: 0;
+		}
+		10% {
+			transform: scale( 1.2 );
+			opacity: 1;
+		}
+		13% {
+			transform: scale( 1 );
+			opacity: 1;
+		}
+		100% {
+			transform: scale(1);
+		}
+	}
+
+	h1 {
+		font-size: calc( var( --3i-font-size ) * 1.2 );
+		line-height: .9em;
+		font-weight: bold;
+		text-wrap: balance;
+
+		@include respond-to( md ) {
+			font-size: calc( var( --3i-font-size ) * 1.4 );
+		}
+	}
+
+	p {
+		text-wrap: balance;
+		margin-bottom: calc( var( --3i-spacing ) * 2 );
+		width: 100%;
+	}
+
+	.video {
+		--demo-border-gradient: linear-gradient( 0deg, var( --3i-demo-border-gradient-colors ) );
+		display: flex;
+		position: relative;
+		flex-direction: column;
+		width: 100%;
+		max-width: 700px;
+		margin-top: calc( var( --3i-spacing ) * 1.5 );
+		box-sizing: border-box;
+
+		&::before, &::after {
+			z-index: -1;
+			position: absolute;
+			inset: -4px;
+			border-radius: calc( var( --3i-border-radius ) * 2 );
+			background: var( --demo-border-gradient );
+			content: "";
+
+		}
+
+		&::before {
+			inset: -3rem;
+			filter: blur(3rem);
+			opacity: .25;
+		}
+
+		article {
+			padding: 0;
+			background-color: var( --3i-original-background-color );
+			z-index: 0;
+			box-shadow: none;
+			border-radius: calc(var(--3i-border-radius) * 2);
+			overflow: hidden;
+		}
+	}
+}

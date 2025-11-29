@@ -1,0 +1,8 @@
+@use "@picocss/pico/scss/colors" as *;
+
+mark {
+	padding: 0;
+	background: linear-gradient( 90deg, $jade-300 0%, $jade-500 100% );
+	background-clip: text;
+	color: transparent;
+}

@@ -1,4 +1,5 @@
 @use "@picocss/pico/scss/settings" as *;
+@use "sass:map";
 
 @mixin no-select {
 	-webkit-user-select: none;
@@ -15,7 +16,7 @@
 }
 
 @function get-breakpoint( $size, $property: 'breakpoint' ) {
-	@return map-get( map-get( $breakpoints, $size ), $property );
+	@return map.get( map.get( $breakpoints, $size ), $property );
 }
 
 @mixin respond-to( $size, $type: 'max' ) {
