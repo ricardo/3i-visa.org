@@ -21,7 +21,7 @@
 			<nav>
 				<ul>
 					<li class="display-desktop-only">
-						<a href="javascript: void(0);" role="button" class="white header-button translate-button" onClick="window.openDialog( '#dialog-auth', '#login' );">
+						<a href="javascript: void(0);" role="button" class="white header-button translate-button" onClick="window.openDialog( '#dialog-language-switcher', '#language-switcher' );">
 							USD /
 							@include( 'icons.globe' )
 						</a>
@@ -37,3 +37,4 @@
 @guest
 	@include( 'dialogs.auth', [ 'open' => Request::has( 'auth' ) ] )
 @endguest
+@include( 'dialogs.language-switcher' )

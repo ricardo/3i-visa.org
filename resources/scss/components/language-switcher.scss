@@ -1,0 +1,35 @@
+// Language Switcher Dialog
+// Styles specific to the language and currency switcher dialog
+#dialog-language-switcher {
+
+	.preference-section {
+		h3 {
+			font-size: 1rem;
+			font-weight: 600;
+			margin-bottom: 0.75rem;
+			color: var( --3i-h1-color );
+		}
+	}
+
+	// Ensure searchable inputs have proper spacing
+	.searchable-input-wrapper {
+		margin-bottom: 0;
+	}
+}
+
+// Language selector article
+#language-switcher {
+	text-align: left;
+	max-width: 500px;
+
+	h2 {
+		margin-bottom: 0;
+		text-align: center;
+	}
+
+	.preference-section {
+		&:not(:last-child) {
+			margin-bottom: 2rem;
+		}
+	}
+}

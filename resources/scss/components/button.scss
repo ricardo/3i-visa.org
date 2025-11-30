@@ -5,6 +5,8 @@ a[role="button"], button, button[role="button"], button[type="submit"], summary[
 	border-radius: .7rem;
 	padding: calc( var( --3i-form-element-spacing-vertical ) * 1.05 ) var( --3i-form-element-spacing-horizontal );
 	transition: .2s;
+	box-shadow: inset 0px 1px color-mix( in oklab, #fff 20%, transparent );
+	border-color: #015638;
 
 	&:active {
 		transform: scale( .97 );

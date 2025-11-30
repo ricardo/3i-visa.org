@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Request;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\AuthController;
 
+use Livewire\Livewire;
+
 $locale = Request::segment( 1 );
 
 if ( $locale === 'en' || ! in_array( $locale, array_keys( config( 'app.supported_locales' ) ) ) ) {
@@ -49,4 +51,20 @@ Route::group( [
 	// Auth:Logout.
 	Route::get( 'logout', [ AuthController::class, 'logout' ] )->name( 'logout' );
 
+	// Register default route without locale prefix.
+	Livewire::setUpdateRoute( function ( $handle ) {
+		return Route::post( '/livewire/update', $handle );
+	} );
 } );
+
+// Livewire routes (must be outside route group for proper locale handling).
+
+
+// // Register Livewire routes for each supported locale.
+// foreach ( array_keys( config( 'app.supported_locales' ) ) as $locale_code ) {
+// 	if ( $locale_code !== 'en' ) {
+// 		Route::post( "{$locale_code}/livewire/update", function () {
+// 			return app( \Livewire\Mechanisms\HandleRequests\HandleRequests::class )->handle();
+// 		} )->middleware( config( 'livewire.middleware_group', 'web' ) );
+// 	}
+// }

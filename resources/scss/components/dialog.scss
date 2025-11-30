@@ -70,6 +70,7 @@ dialog {
 		border: 1px solid var( --3i-layout-border-color );
 		border-top: 1px solid var( --3i-dialog-border-rgba );
 		background-color: white !important;
+		overflow: visible;
 
 		// Se o navegador suporta OKLCH, usa as cores melhores.
 		@supports ( color: oklch( 50% 0 0 ) ) {
@@ -140,7 +141,12 @@ dialog {
 			width: 100%;
 		}
 
-		@include respond-to( sm ) {
+
+	}
+
+	@include respond-to( sm ) {
+
+		article {
 			width: 100%;
 			max-width: 100%;
 			margin: 0;
@@ -151,7 +157,9 @@ dialog {
 
 			// Different animation on mobile.
 			animation-name: slideUp;
+		}
 
+		&:not( .floating ) {
 			.close {
 				display: none;
 			}
