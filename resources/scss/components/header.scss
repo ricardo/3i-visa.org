@@ -4,14 +4,14 @@ body > header {
 	transition: box-shadow .4s ease-in-out;
 	background-color: var( --3i-header-background );
 	border-bottom: 1px solid transparent;
-	padding: .75rem 0;
+	padding: .8rem 0;
 	border-bottom: 1px solid var( --3i-border-color );
 
 	// Sticky.
 	position: sticky;
 	top: 0;
-	backdrop-filter: blur( 1rem );
 	z-index: 100;
+	background: var( --3i-background-color );
 
 	.container {
 		position: relative;
@@ -33,7 +33,7 @@ body > header {
 	}
 
 	.header-button {
-		padding: .22rem .88rem;
+		padding: .37rem 1rem;
 		font-size: .88rem;
 	}
 
@@ -49,6 +49,7 @@ body > header {
 	}
 
 	nav {
+		margin-top: 4px;
 		ul li {
 			font-weight: 500;
 			padding: 0 calc( var( --3i-nav-element-spacing-horizontal ) * .9 );

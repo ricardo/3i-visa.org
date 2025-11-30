@@ -4,7 +4,7 @@
 <header>
 	<div class="container">
 		<a href="{{ route( 'home' ) }}" class="logo">
-			<img src="{{ asset( 'images/logo-2.svg' ) }}" alt="3i Visa">
+			<img src="{{ asset( 'images/logo.svg' ) }}" alt="3i Visa">
 		</a>
 
 		@guest
@@ -21,13 +21,13 @@
 			<nav>
 				<ul>
 					<li class="display-desktop-only">
-						<a href="javascript: void(0);" role="button" class="contrast outline header-button translate-button" onClick="window.openDialog( '#dialog-auth', '#login' );">
+						<a href="javascript: void(0);" role="button" class="white header-button translate-button" onClick="window.openDialog( '#dialog-auth', '#login' );">
 							USD /
 							@include( 'icons.globe' )
 						</a>
 					</li>
 					<li class="display-desktop-only">
-						<a href="javascript: void(0);" role="button" class="contrast outline header-button" onClick="window.openDialog( '#dialog-auth', '#login' );">@lang( 'Log in' )</a>
+						<a href="javascript: void(0);" role="button" class="white header-button" onClick="window.openDialog( '#dialog-auth', '#login' );">@lang( 'Log in' )</a>
 					</li>
 				</ul>
 			</nav>

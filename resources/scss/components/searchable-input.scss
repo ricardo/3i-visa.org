@@ -63,8 +63,8 @@
 	left: 0;
 	right: 0;
 	background: var( --3i-background-color );
-	border: 2px solid var( --3i-muted-border-color );
-	border-radius: 1.4rem; // var( --3i-border-radius );
+	border: 1.5px solid var( --3i-border-color );
+	border-radius: .7rem;
 	box-shadow: var( --3i-box-shadow );
 	z-index: 1000;
 	overflow: hidden;
@@ -112,11 +112,11 @@
 
 	&:hover,
 	&.highlighted {
-		background-color: var( --3i-secondary-focus );
+		background-color: #F2F2F2;
 	}
 
 	&:active {
-		background-color: var( --3i-secondary-focus );
+		background-color: #F2F2F2;
 	}
 }
 

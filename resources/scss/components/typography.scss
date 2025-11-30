@@ -18,3 +18,11 @@ h1, h2, h3 {
 		text-decoration-color: var( --3i-muted-color );
 	}
 }
+
+.color-text {
+	color: var( --3i-font-color );
+
+	&:is(a) {
+		text-decoration-color: var( --3i-font-color );
+	}
+}

@@ -14,7 +14,7 @@
 				Lorem ipsum dolor sit amet consectetur
 			</p>
 			<div class="grid column" accesskey="1">
-				<a href="#" role="button" class="contrast">
+				<a href="#" role="button" class="">
 					@lang( 'Get Started' )
 					@include('icons.arrow-right')
 				</a>
@@ -23,5 +23,6 @@
 				</small>
 			</div>
 		</section>
+		<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 	</main>
 @endsection

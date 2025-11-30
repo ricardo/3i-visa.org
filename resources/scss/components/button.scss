@@ -1,12 +1,32 @@
 a[role="button"], button, button[role="button"], button[type="submit"], summary[role="button"] {
-	--3i-font-weight: 600;
+	--3i-font-weight: 500;
 	font-size: .9rem;
-	border-width: 1.5px;
-	border-radius: 1.44rem;
+	border-width: 1px;
+	border-radius: .7rem;
 	padding: calc( var( --3i-form-element-spacing-vertical ) * 1.05 ) var( --3i-form-element-spacing-horizontal );
+	transition: .2s;
+
+	&:active {
+		transform: scale( .97 );
+	}
 
 	&.outline:hover {
 		outline: .8px solid !important;
+	}
+
+	&.white {
+		background-color: white;
+		color: var( --3i-font-color ) !important;
+		box-shadow: 0 1px 2px 0 rgb( 0 0 0 / 0.05 );
+		border-color: oklch( 88% 0.003 48.717 );
+
+		&:hover {
+			background-color: #FAFAFA;
+		}
+
+		@supports ( color: color-mix( in lab, green, green ) ) {
+			border-bottom-color: color-mix( in oklab, oklch( 86.9% 0.005 56.366 ) 80%, transparent );
+		}
 	}
 
 	&.vendor-login-button {

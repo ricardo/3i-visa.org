@@ -18,6 +18,7 @@
 @use "components/searchable-input";
 
 @use "auth";
+@use "sections/hero";
 
 // Flag icons for country flags.
 @import "flag-icons/css/flag-icons.css";
@@ -35,7 +36,9 @@
 }
 
 [data-theme="light"] {
-	--3i-border-color: #D5E1E2;
+	--3i-background-color: #FAFAF9 !important;
+	--3i-font-color: oklch( 0.268 0.007 34.298 );
+	--3i-border-color: #E7E5E4;
 	--3i-form-element-active-border-color: rgb(90, 90, 90) !important;
 	--3i-form-element-focus-color: rgb(90, 90, 90) !important;
 
@@ -174,8 +177,6 @@ main.landing {
 			}
 		}
 	}
-
-	@import "sections/hero";
 }
 
 

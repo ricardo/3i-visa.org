@@ -9,14 +9,14 @@
 	&::before, &::after {
 		content: '';
 		flex: 1;
-		border-bottom: 1px solid var( --3i-muted-border-color );
+		border-bottom: 1px solid var( --3i-border-color );
 	}
 
-	&:not(:empty)::before {
-		margin-right: .5em;
+	&:not( :empty )::before {
+		margin-right: 1.5em;
 	}
 
-	&:not(:empty)::after {
-		margin-left: .5em;
+	&:not( :empty )::after {
+		margin-left: 1.5em;
 	}
 }

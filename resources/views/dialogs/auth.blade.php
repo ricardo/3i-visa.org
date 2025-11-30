@@ -25,7 +25,7 @@
 
 			<div class="grid" style="margin-bottom: 1.5rem">
 				<div style="text-align: right">
-					<a id="toggle-forgot-password" class="color-muted fs-2">@lang( 'Forgot your password?' )</a>
+					<a id="toggle-forgot-password" class="color-text fs-2">@lang( 'Forgot your password?' )</a>
 				</div>
 			</div>
 
@@ -90,7 +90,7 @@
 
 			<div class="grid mt-3 mb-3">
 				<div style="text-align: left">
-					<a class="toggle-login color-muted">@lang( 'Back to login' )</a>
+					<a class="toggle-login color-text">@lang( 'Back to login' )</a>
 				</div>
 			</div>
 
@@ -115,7 +115,7 @@
 		</p>
 
 		<div style="text-align: center">
-			<a class="toggle-login color-muted">@lang( 'Back to login' )</a>
+			<a class="toggle-login color-text">@lang( 'Back to login' )</a>
 		</div>
 	</article>
 
