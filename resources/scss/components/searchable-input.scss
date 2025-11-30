@@ -1,0 +1,178 @@
+// Searchable Input Component
+// Reusable searchable dropdown with optional flag icons
+
+.searchable-input-wrapper {
+	position: relative;
+	width: 100%;
+}
+
+.searchable-input-container {
+	position: relative;
+	width: 100%;
+}
+
+.searchable-input-field {
+	position: relative;
+	width: 100%;
+
+	.searchable-input {
+		width: 100%;
+		padding-right: 3rem;
+		margin-bottom: 0;
+
+		&.has-flag {
+			padding-left: 3.2rem;
+		}
+	}
+}
+
+.searchable-input-selected-flag {
+	position: absolute;
+	left: 1rem;
+	top: 50%;
+	transform: translateY( -50% );
+	width: 1.5rem;
+	height: 1.125rem;
+	border-radius: 2px;
+	overflow: hidden;
+	display: inline-block;
+	background-size: cover;
+	pointer-events: none;
+	z-index: 1;
+}
+
+.searchable-input-chevron {
+	position: absolute;
+	right: 1rem;
+	top: 50%;
+	transform: translateY( -50% );
+	width: 1.25rem;
+	height: 1.25rem;
+	color: var( --3i-muted-color );
+	pointer-events: none;
+	transition: transform 0.2s ease;
+
+	&.rotated {
+		transform: translateY( -50% ) rotate( 180deg );
+	}
+}
+
+.searchable-input-dropdown {
+	position: absolute;
+	top: calc( 100% + 0.25rem );
+	left: 0;
+	right: 0;
+	background: var( --3i-background-color );
+	border: 2px solid var( --3i-muted-border-color );
+	border-radius: 1.4rem; // var( --3i-border-radius );
+	box-shadow: var( --3i-box-shadow );
+	z-index: 1000;
+	overflow: hidden;
+}
+
+.searchable-input-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	max-height: calc( 3rem * 4 ); // 4 visible items
+	overflow-y: auto;
+
+	// Custom scrollbar styling
+	&::-webkit-scrollbar {
+		width: 0.5rem;
+	}
+
+	&::-webkit-scrollbar-track {
+		background: var( --3i-background-color );
+	}
+
+	&::-webkit-scrollbar-thumb {
+		background: var( --3i-muted-border-color );
+		border-radius: var( --3i-border-radius );
+
+		&:hover {
+			background: var( --3i-secondary );
+		}
+	}
+}
+
+.searchable-input-item {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.75rem 1rem;
+	cursor: pointer;
+	transition: background-color 0.15s ease;
+	border-bottom: 1px solid var( --3i-muted-border-color );
+	margin-bottom: 0;
+
+	&:last-child {
+		border-bottom: none;
+	}
+
+	&:hover,
+	&.highlighted {
+		background-color: var( --3i-secondary-focus );
+	}
+
+	&:active {
+		background-color: var( --3i-secondary-focus );
+	}
+}
+
+.searchable-input-flag {
+	flex-shrink: 0;
+	width: 1.5rem;
+	height: 1.125rem;
+	border-radius: 2px;
+	overflow: hidden;
+	display: inline-block;
+	background-size: cover;
+}
+
+.searchable-input-item-text {
+	flex: 1;
+	font-size: 1rem;
+	color: var( --3i-color );
+}
+
+.searchable-input-no-results {
+	padding: 1rem;
+	text-align: center;
+	color: var( --3i-muted-color );
+	font-size: 0.875rem;
+}
+
+// Transition classes for Alpine.js
+.searchable-input-transition-enter {
+	transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.searchable-input-transition-enter-start {
+	opacity: 0;
+	transform: translateY( -0.5rem );
+}
+
+.searchable-input-transition-enter-end {
+	opacity: 1;
+	transform: translateY( 0 );
+}
+
+.searchable-input-transition-leave {
+	transition: opacity 0.1s ease, transform 0.1s ease;
+}
+
+.searchable-input-transition-leave-start {
+	opacity: 1;
+	transform: translateY( 0 );
+}
+
+.searchable-input-transition-leave-end {
+	opacity: 0;
+	transform: translateY( -0.5rem );
+}
+
+// Alpine.js x-cloak utility
+[x-cloak] {
+	display: none !important;
+}

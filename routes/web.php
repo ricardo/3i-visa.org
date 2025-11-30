@@ -18,6 +18,11 @@ Route::group( [
 
 	Route::get( '/', [ SiteController::class, 'getHomePage' ] )->name( 'home' );
 
+	// Demo page for searchable input component.
+	Route::get( 'demo/searchable-input', function() {
+		return view( 'examples.searchable-input-demo' );
+	} )->name( 'demo.searchable-input' );
+
 	Route::get( 'contact', [ SiteController::class, 'getContactPage' ] )->name( 'contact' );
 	Route::post( 'contact', [ SiteController::class, 'postContactForm' ] )->name( 'contact' );
 	Route::get( 'terms', [ SiteController::class, 'getTerms' ] )->name( 'terms' );

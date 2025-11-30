@@ -4,7 +4,7 @@
 <header>
 	<div class="container">
 		<a href="{{ route( 'home' ) }}" class="logo">
-			<img src="{{ asset( 'images/logo.webp' ) }}" alt="3i Visa">
+			<img src="{{ asset( 'images/logo-2.svg' ) }}" alt="3i Visa">
 		</a>
 
 		@guest

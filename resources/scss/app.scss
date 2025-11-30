@@ -15,8 +15,12 @@
 @use "components/input";
 @use "components/mark";
 @use "components/dialog";
+@use "components/searchable-input";
 
 @use "auth";
+
+// Flag icons for country flags.
+@import "flag-icons/css/flag-icons.css";
 
 // Variables.
 :root {
