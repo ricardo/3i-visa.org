@@ -14,7 +14,7 @@
 			@yield( 'content' )
 
 			@if ( ! isset( $footer ) || $footer )
-				{{-- @include( 'partials.footer' )  --}}
+				@include( 'partials.footer' )
 			@endif
 		</div>
 

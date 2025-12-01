@@ -1,3 +1,5 @@
+@use "@picocss/pico/scss/colors" as *;
+
 a[role="button"], button, button[role="button"], button[type="button"], button[type="submit"], summary[role="button"] {
 	--3i-font-weight: 500;
 	font-size: .9rem;
@@ -7,6 +9,7 @@ a[role="button"], button, button[role="button"], button[type="button"], button[t
 	transition: .2s;
 	box-shadow: inset 0px 1px color-mix( in oklab, #fff 30%, transparent ) !important;
 	border-color: #015638;
+	background-color: $jade-450;
 
 	&:active {
 		transform: scale( .97 );
@@ -18,6 +21,7 @@ a[role="button"], button, button[role="button"], button[type="button"], button[t
 
 	&.contrast {
 		border-color: black;
+		background-color: #222;
 	}
 
 	&.white {
