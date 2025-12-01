@@ -10,6 +10,7 @@ class SearchableInput extends Component {
 	public $placeholder = 'Search...';
 	public $show_flags = false;
 	public $wire_model = '';
+	public $initial_value = null;
 
 	public $search = '';
 	public $selected_value = '';
@@ -24,12 +25,26 @@ class SearchableInput extends Component {
 	 * @param string $placeholder Input placeholder text
 	 * @param bool $show_flags Whether to show country flags
 	 * @param string $wire_model Name for wire:model binding
+	 * @param array|string|null $initial_value Initial selected value
 	 */
-	public function mount( $items = [], $placeholder = 'Search...', $show_flags = false, $wire_model = '' ) {
+	public function mount( $items = [], $placeholder = 'Search...', $show_flags = false, $wire_model = '', $initial_value = null ) {
 		$this->items = $items;
 		$this->placeholder = $placeholder;
 		$this->show_flags = $show_flags;
 		$this->wire_model = $wire_model;
+		$this->initial_value = $initial_value;
+
+		// Set initial value if provided
+		if ( $this->initial_value ) {
+			if ( is_array( $this->initial_value ) && isset( $this->initial_value['name'] ) ) {
+				$this->search = $this->initial_value['name'];
+				$this->selected_value = $this->initial_value;
+				$this->selected_flag_code = $this->initial_value['code'] ?? '';
+			} elseif ( is_string( $this->initial_value ) ) {
+				$this->search = $this->initial_value;
+				$this->selected_value = $this->initial_value;
+			}
+		}
 	}
 
 	/**

@@ -32,6 +32,7 @@ Route::group( [
 
 	// Language switcher.
 	Route::post( 'language/switch', [ SiteController::class, 'postSwitchLanguage' ] )->name( 'language.switch' );
+	Route::post( 'preferences/save', [ SiteController::class, 'postSavePreferences' ] )->name( 'preferences.save' );
 
 	// Auth:Login.
 	Route::post( 'login', [ AuthController::class, 'postLogin' ] )->name( 'login.post' );
@@ -51,20 +52,7 @@ Route::group( [
 	// Auth:Logout.
 	Route::get( 'logout', [ AuthController::class, 'logout' ] )->name( 'logout' );
 
-	// Register default route without locale prefix.
 	Livewire::setUpdateRoute( function ( $handle ) {
-		return Route::post( '/livewire/update', $handle );
-	} );
+        return Route::post( 'livewire/update', $handle );
+    } );
 } );
-
-// Livewire routes (must be outside route group for proper locale handling).
-
-
-// // Register Livewire routes for each supported locale.
-// foreach ( array_keys( config( 'app.supported_locales' ) ) as $locale_code ) {
-// 	if ( $locale_code !== 'en' ) {
-// 		Route::post( "{$locale_code}/livewire/update", function () {
-// 			return app( \Livewire\Mechanisms\HandleRequests\HandleRequests::class )->handle();
-// 		} )->middleware( config( 'livewire.middleware_group', 'web' ) );
-// 	}
-// }

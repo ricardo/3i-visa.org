@@ -42,4 +42,47 @@ class SiteController extends Controller {
 
 		return redirect( $new_url );
 	}
+
+	public function postSavePreferences( Request $request ) {
+		$new_locale = $request->input( 'locale' );
+		$new_currency = $request->input( 'currency' );
+		$supported_locales = array_keys( config( 'app.supported_locales' ) );
+		$supported_currencies = [ 'USD', 'BRL', 'COP' ]; // Match Currencies helper.
+
+		// Validate new locale.
+		if ( ! in_array( $new_locale, $supported_locales ) ) {
+			return redirect()->back();
+		}
+
+		// Validate new currency.
+		if ( ! in_array( $new_currency, $supported_currencies ) ) {
+			return redirect()->back();
+		}
+
+		// Update cookies if not a bot.
+		if ( ! is_crawler_bot( $request ) ) {
+			$minutes = 60 * 24 * 180; // 180 days.
+
+			// Save locale cookies.
+			Cookie::queue( 'preferred_locale', $new_locale, $minutes );
+			Cookie::queue( 'preferred_locale_src', 'manual', $minutes );
+			Cookie::queue( 'preferred_locale_ts', (string) now()->timestamp, $minutes );
+
+			// Save currency cookie.
+			Cookie::queue( 'preferred_currency', $new_currency, $minutes );
+			Cookie::queue( 'preferred_currency_ts', (string) now()->timestamp, $minutes );
+		}
+
+		// Get the current path without locale.
+		$current_path = get_current_path_without_locale( route( $request->input( 'current_route' ) ) );
+		$new_url      = get_localized_url( $new_locale, $current_path );
+
+		// Add locale to user's profile if logged in.
+		$user = auth()->check() ? auth()->user() : null;
+		if ( $user && $user->locale !== $new_locale ) {
+			$user->update( [ 'locale' => $new_locale ] );
+		}
+
+		return redirect( $new_url );
+	}
 }

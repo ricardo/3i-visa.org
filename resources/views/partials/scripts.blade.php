@@ -15,6 +15,26 @@
 			toast( event.detail[0].message );
 		} );
 	</script>
+	{{-- Fix Livewire bug from Laravel 11 --}}
+	<script>
+		( function() {
+			const segment = window.location.pathname.split('/')[1];
+			const localePrefix = (segment && segment !== 'en') ? `/${segment}` : '';
+
+			// Wait for DOM to load so we can modify the tag before Livewire boots
+			document.addEventListener( 'DOMContentLoaded', function() {
+				const lwScript = document.querySelector( 'script[src*="livewire"][data-update-uri]' );
+				if ( ! lwScript ) {
+					return;
+				}
+
+				const original = lwScript.getAttribute( 'data-update-uri' );
+				const updated = localePrefix + original;
+
+				lwScript.setAttribute( 'data-update-uri', updated );
+			} );
+		} )();
+	</script>
 @endpush
 
 @if ( isset( $errors ) && $errors->any() )
