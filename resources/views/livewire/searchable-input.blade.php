@@ -4,6 +4,12 @@
 		isOpen: @entangle('is_open'),
 		highlightedIndex: @entangle('highlighted_index'),
 		itemCount: {{ count( $filtered_items ) }},
+		required: {{ $required ? 'true' : 'false' }},
+
+		handleInputClick() {
+			// Call Livewire method to properly clear and open dropdown
+			$wire.clearForNewSelection();
+		},
 
 		handleKeydown(event) {
 			if ( !this.isOpen ) {
@@ -59,7 +65,7 @@
 			} );
 		}
 	}"
-	x-on:click.away="$wire.closeDropdown()"
+	x-on:click.away="$wire.handleBlur()"
 	wire:ignore.self
 >
 	<div class="searchable-input-container">
@@ -76,7 +82,7 @@
 				placeholder="{{ $placeholder }}"
 				class="searchable-input {{ $show_flags && $selected_flag_code ? 'has-flag' : '' }}"
 				x-on:keydown="handleKeydown"
-				x-on:focus="isOpen = true"
+				x-on:click="handleInputClick()"
 				autocomplete="off"
 			/>
 

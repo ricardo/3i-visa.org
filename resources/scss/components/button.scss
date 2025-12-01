@@ -1,11 +1,11 @@
-a[role="button"], button, button[role="button"], button[type="submit"], summary[role="button"] {
+a[role="button"], button, button[role="button"], button[type="button"], button[type="submit"], summary[role="button"] {
 	--3i-font-weight: 500;
 	font-size: .9rem;
 	border-width: 1px;
 	border-radius: .7rem;
 	padding: calc( var( --3i-form-element-spacing-vertical ) * 1.05 ) var( --3i-form-element-spacing-horizontal );
 	transition: .2s;
-	box-shadow: inset 0px 1px color-mix( in oklab, #fff 20%, transparent );
+	box-shadow: inset 0px 1px color-mix( in oklab, #fff 30%, transparent ) !important;
 	border-color: #015638;
 
 	&:active {
@@ -14,6 +14,10 @@ a[role="button"], button, button[role="button"], button[type="submit"], summary[
 
 	&.outline:hover {
 		outline: .8px solid !important;
+	}
+
+	&.contrast {
+		border-color: black;
 	}
 
 	&.white {

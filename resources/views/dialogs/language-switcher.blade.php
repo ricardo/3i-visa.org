@@ -75,7 +75,8 @@
 					'placeholder' => __( 'Select language...' ),
 					'show_flags' => true,
 					'wire_model' => 'selected_language',
-					'initial_value' => $current_language_item
+					'initial_value' => $current_language_item,
+					'required' => true
 				] )
 			</div>
 
@@ -87,7 +88,8 @@
 					'placeholder' => __( 'Select currency...' ),
 					'show_flags' => false,
 					'wire_model' => 'selected_currency',
-					'initial_value' => $current_currency_item
+					'initial_value' => $current_currency_item,
+					'required' => true
 				] )
 			</div>
 

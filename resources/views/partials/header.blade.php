@@ -1,5 +1,6 @@
 @php
-	$user   = auth()->getUser();
+	$user             = auth()->getUser();
+	$current_currency = request()->cookie( 'preferred_currency', 'USD' );
 @endphp
 <header>
 	<div class="container">
@@ -22,7 +23,7 @@
 				<ul>
 					<li class="display-desktop-only">
 						<a href="javascript: void(0);" role="button" class="white header-button translate-button" onClick="window.openDialog( '#dialog-language-switcher', '#language-switcher' );">
-							USD /
+							{{ $current_currency }} /
 							@include( 'icons.globe' )
 						</a>
 					</li>
