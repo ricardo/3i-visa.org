@@ -24,10 +24,11 @@ class LocaleMiddleware {
 			return $next( $request );
 		}
 
-		$segment            = $request->segment( 1 );
-		$supported_locales  = array_keys( config( 'app.supported_locales' ) );
-		$is_bot             = is_crawler_bot( $request );
-		$minutes            = 60 * 24 * 180; // 180 days.
+		$segment             = $request->segment( 1 );
+		$supported_locales   = array_keys( config( 'app.supported_locales' ) );
+		$locale_currency_map = config( 'app.locale_currency_map' );
+		$is_bot              = is_crawler_bot( $request );
+		$minutes             = 60 * 24 * 180; // 180 days.
 
 		// One-time enforcement right after login.
 		if ( $forced = $request->session()->pull( 'force_account_locale' ) ) {
@@ -39,6 +40,16 @@ class LocaleMiddleware {
 				Cookie::queue( 'preferred_locale', $forced, $minutes );
 				Cookie::queue( 'preferred_locale_src', $src, $minutes );
 				Cookie::queue( 'preferred_locale_ts', (string) now()->timestamp, $minutes );
+
+				// Auto-assign currency based on locale if no manual preference exists.
+				$cookie_currency_src = $request->cookie( 'preferred_currency_src' );
+				if ( $cookie_currency_src !== 'manual' && isset( $locale_currency_map[ $forced ] ) ) {
+					$auto_currency = $locale_currency_map[ $forced ];
+					Cookie::queue( 'preferred_currency', $auto_currency, $minutes );
+					Cookie::queue( 'preferred_currency_src', 'auto', $minutes );
+					Cookie::queue( 'preferred_currency_ts', (string) now()->timestamp, $minutes );
+					$request->attributes->set( 'current_currency', $auto_currency );
+				}
 			}
 
 			// Normalize URL to forced locale ("/" for en, "/{locale}" otherwise).
@@ -68,6 +79,16 @@ class LocaleMiddleware {
 				Cookie::queue( 'preferred_locale', $segment, $minutes );
 				Cookie::queue( 'preferred_locale_src', 'url', $minutes );
 				Cookie::queue( 'preferred_locale_ts', (string) now()->timestamp, $minutes );
+
+				// Auto-assign currency based on locale if no manual preference exists.
+				$cookie_currency_src = $request->cookie( 'preferred_currency_src' );
+				if ( $cookie_currency_src !== 'manual' && isset( $locale_currency_map[ $segment ] ) ) {
+					$auto_currency = $locale_currency_map[ $segment ];
+					Cookie::queue( 'preferred_currency', $auto_currency, $minutes );
+					Cookie::queue( 'preferred_currency_src', 'auto', $minutes );
+					Cookie::queue( 'preferred_currency_ts', (string) now()->timestamp, $minutes );
+					$request->attributes->set( 'current_currency', $auto_currency );
+				}
 			}
 
 			return $next( $request );

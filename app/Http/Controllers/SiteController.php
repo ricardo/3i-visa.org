@@ -70,6 +70,7 @@ class SiteController extends Controller {
 
 			// Save currency cookie.
 			Cookie::queue( 'preferred_currency', $new_currency, $minutes );
+			Cookie::queue( 'preferred_currency_src', 'manual', $minutes );
 			Cookie::queue( 'preferred_currency_ts', (string) now()->timestamp, $minutes );
 		}
 

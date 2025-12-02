@@ -1,5 +1,5 @@
 @php
-	$current_currency = request()->cookie( 'preferred_currency', 'USD' );
+	$current_currency = request()->attributes->get( 'current_currency' ) ?? request()->cookie( 'preferred_currency', 'USD' );
 @endphp
 <footer>
 	<div class="container">

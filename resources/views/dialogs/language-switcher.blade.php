@@ -1,7 +1,7 @@
 @php
 	$supported_locales = config( 'app.supported_locales', [] );
 	$current_locale = app()->getLocale();
-	$current_currency = request()->cookie( 'preferred_currency', 'USD' );
+	$current_currency = request()->attributes->get( 'current_currency' ) ?? request()->cookie( 'preferred_currency', 'USD' );
 
 	// Map locales to country codes for flags
 	$locale_flags = [
