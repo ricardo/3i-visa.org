@@ -37,6 +37,10 @@ Route::group( [
 	// Visa check.
 	Route::post( 'visa-check', [ SiteController::class, 'postVisaCheck' ] )->name( 'visa-check' );
 
+	// Apply page.
+	Route::get( '{country}/apply', [ SiteController::class, 'getApplyPage' ] )->name( 'apply' );
+	Route::post( '{country}/apply', [ SiteController::class, 'postApplyPage' ] )->name( 'apply.submit' );
+
 	// Auth:Login.
 	Route::post( 'login', [ AuthController::class, 'postLogin' ] )->name( 'login.post' );
 	Route::get( 'login/google', [ AuthController::class, 'getLoginWithGoogle' ] )->name( 'login.google' );

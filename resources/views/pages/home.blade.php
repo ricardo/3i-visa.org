@@ -38,8 +38,8 @@
 				x-data="{
 					selectedPassport: {{ json_encode( $pre_selected_passport ) }},
 					selectedDestination: null,
-					passportError: false,
-					destinationError: false,
+					passportError: {{ $errors->has('nationality') || $errors->has('passport') ? 'true' : 'false' }},
+					destinationError: {{ $errors->has('destination') ? 'true' : 'false' }},
 					canSubmit: true,
 					handlePassportSelection(event) {
 						this.selectedPassport = event.detail.value;
@@ -66,14 +66,11 @@
 					}
 				}"
 				x-on:item-selected.window="
-					console.log('Event received:', $event.detail);
 					if ($event.detail.wireModel === 'passport') {
-						console.log('Passport selected');
 						selectedPassport = $event.detail.value;
 						passportError = false;
 						updateSubmitState();
 					} else if ($event.detail.wireModel === 'destination') {
-						console.log('Destination selected');
 						selectedDestination = $event.detail.value;
 						destinationError = false;
 						updateSubmitState();
@@ -96,7 +93,7 @@
 							] )
 						</div>
 						<small class="error-message" x-show="passportError" x-transition>
-							@lang( 'Please select your passport country' )
+							{{ $errors->first('nationality') ?: $errors->first('passport') ?: __( 'Please select your passport country' ) }}
 						</small>
 						<input type="hidden" name="passport" x-bind:value="selectedPassport ? selectedPassport.code : ''" required>
 					</div>
@@ -113,7 +110,7 @@
 							] )
 						</div>
 						<small class="error-message" x-show="destinationError" x-transition>
-							@lang( 'Please select your destination' )
+							{{ $errors->first('destination') ?: __( 'Please select your destination' ) }}
 						</small>
 						<input type="hidden" name="destination" x-bind:value="selectedDestination ? selectedDestination.code : ''" required>
 					</div>

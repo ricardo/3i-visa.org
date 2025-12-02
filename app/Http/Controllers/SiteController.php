@@ -96,22 +96,131 @@ class SiteController extends Controller {
 
 		if ( ! in_array( $passport, $valid_countries ) || ! in_array( $destination, $valid_countries ) ) {
 			return redirect()->back()->withErrors( [
-				'visa_check' => __( 'Please select valid countries for both passport and destination.' )
+				'nationality' => __( 'Please select a valid country.' )
 			] );
 		}
 
 		// Prevent same country selection.
 		if ( $passport === $destination ) {
 			return redirect()->back()->withErrors( [
-				'visa_check' => __( 'Your passport country and destination cannot be the same.' )
+				'destination' => __( 'Your passport country and destination cannot be the same.' )
 			] );
 		}
 
-		// TODO: Implement visa requirements lookup and redirect to results page.
+		// Country code to slug mapping.
+		$country_slugs = [
+			'au' => 'australia',
+			'br' => 'brazil',
+			'ca' => 'canada',
+			'co' => 'colombia',
+			'fr' => 'france',
+			'de' => 'germany',
+			'gb' => 'united-kingdom',
+			'us' => 'united-states',
+		];
+
+		// Store nationality (passport) in session.
+		$request->session()->put( 'visa_application', [
+			'nationality' => $passport,
+			'destination' => $destination,
+		] );
+
+		// Get destination slug.
+		$destination_slug = $country_slugs[ $destination ] ?? $destination;
+
+		// Redirect to apply page.
+		return redirect()->route( 'apply', [ 'country' => $destination_slug ] );
+	}
+
+	public function getApplyPage( Request $request, $country ) {
+		// Slug to country code mapping.
+		$slug_to_code = [
+			'australia' => 'au',
+			'brazil' => 'br',
+			'canada' => 'ca',
+			'colombia' => 'co',
+			'france' => 'fr',
+			'germany' => 'de',
+			'united-kingdom' => 'gb',
+			'united-states' => 'us',
+		];
+
+		// Country code to name mapping.
+		$country_names = [
+			'au' => 'Australia',
+			'br' => 'Brazil',
+			'ca' => 'Canada',
+			'co' => 'Colombia',
+			'fr' => 'France',
+			'de' => 'Germany',
+			'gb' => 'United Kingdom',
+			'us' => 'United States',
+		];
+
+		// Get country code from slug.
+		$country_code = $slug_to_code[ $country ] ?? null;
+
+		if ( ! $country_code ) {
+			abort( 404 );
+		}
+
+		// Get visa application data from session.
+		$visa_data = $request->session()->get( 'visa_application', [] );
+		$nationality = $visa_data['nationality'] ?? null;
+
+		// If no nationality in session, redirect to home.
+		if ( ! $nationality ) {
+			return redirect()->route( 'home' );
+		}
+
+		// Get country list for dropdown.
+		$visa_countries = [
+			[ 'name' => 'Australia', 'code' => 'au' ],
+			[ 'name' => 'Brazil', 'code' => 'br' ],
+			[ 'name' => 'Canada', 'code' => 'ca' ],
+			[ 'name' => 'Colombia', 'code' => 'co' ],
+			[ 'name' => 'France', 'code' => 'fr' ],
+			[ 'name' => 'Germany', 'code' => 'de' ],
+			[ 'name' => 'United Kingdom', 'code' => 'gb' ],
+			[ 'name' => 'United States', 'code' => 'us' ],
+		];
+
+		// Find pre-selected nationality.
+		$selected_nationality = null;
+		foreach ( $visa_countries as $c ) {
+			if ( $c['code'] === $nationality ) {
+				$selected_nationality = $c;
+				break;
+			}
+		}
+
+		return view( 'pages.apply', [
+			'country_name' => $country_names[ $country_code ],
+			'country_code' => $country_code,
+			'country_slug' => $country,
+			'visa_countries' => $visa_countries,
+			'selected_nationality' => $selected_nationality,
+		] );
+	}
+
+	public function postApplyPage( Request $request, $country ) {
+		// Validate inputs.
+		$request->validate( [
+			'nationality' => 'required|string|in:au,br,ca,co,fr,de,gb,us',
+			'applicants' => 'required|integer|min:1|max:10',
+		] );
+
+		$nationality = $request->input( 'nationality' );
+		$applicants = $request->input( 'applicants' );
+
+		// Store in session.
+		$request->session()->put( 'visa_application.applicants', $applicants );
+		$request->session()->put( 'visa_application.nationality', $nationality );
+
+		// TODO: Redirect to next step (application form).
 		// For now, redirect back with success message.
-		return redirect()->back()->with( 'success', __( 'Visa check successful! Passport: :passport, Destination: :destination', [
-			'passport' => strtoupper( $passport ),
-			'destination' => strtoupper( $destination ),
+		return redirect()->back()->with( 'success', __( 'Application started! Applicants: :count', [
+			'count' => $applicants,
 		] ) );
 	}
 }

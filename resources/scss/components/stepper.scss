@@ -1,0 +1,52 @@
+// Stepper component styles
+.stepper {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	max-width: 150px;
+	border: 1px solid var( --3i-border-color );
+	box-shadow: 0 1px 2px 0 rgb( 0 0 0 / 0.05 );
+	padding: 5px;
+	border-radius: var( --3i-border-radius );
+
+	.stepper-display {
+		flex: 1;
+		font-size: .9rem;
+		color: var( --3i-h1-color );
+		text-align: center;
+	}
+
+	.stepper-button {
+		margin-bottom: 0;
+		width: 2.2rem;
+		height: 2.2rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid #E7E5E4;
+		background: white;
+		cursor: pointer;
+		padding: 0;
+
+		svg {
+			width: 1.25rem;
+			height: 1.25rem;
+			color: var( --3i-h1-color );
+		}
+
+		&:hover:not(:disabled) {
+			background: white;
+		}
+
+		&:disabled {
+			color: black;
+			opacity: 1;
+			background: #F4F4F4;
+			border-color: #F4F4F4;
+			cursor: not-allowed;
+		}
+	}
+}
+
+
+
