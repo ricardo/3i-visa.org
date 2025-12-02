@@ -100,7 +100,7 @@ class SearchableInput extends Component {
 			$this->highlighted_index = -1;
 
 			// Emit event for parent component
-			$this->dispatch( 'item-selected', value: $this->selected_value );
+			$this->dispatch( 'item-selected', value: $this->selected_value, wireModel: $this->wire_model );
 		}
 	}
 

@@ -26,6 +26,17 @@
 	}
 }
 
+// Invalid state styling
+[aria-invalid="true"] {
+	.searchable-input {
+		border-color: var( --3i-form-element-invalid-border-color ) !important;
+	}
+
+	.searchable-input-chevron {
+		color: var( --3i-form-element-invalid-border-color );
+	}
+}
+
 .searchable-input-selected-flag {
 	position: absolute;
 	left: 1rem;

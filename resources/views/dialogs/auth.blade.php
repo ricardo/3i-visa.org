@@ -42,7 +42,7 @@
 				@if ( request()->routeIs( 'create' ) )
 					@lang( 'She is waiting for you, sign up!' )
 				@else
-					@lang( 'Create a Free Account' )
+					@lang( 'Create an Account' )
 				@endif
 			</h2>
 

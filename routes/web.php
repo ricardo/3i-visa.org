@@ -34,6 +34,9 @@ Route::group( [
 	Route::post( 'language/switch', [ SiteController::class, 'postSwitchLanguage' ] )->name( 'language.switch' );
 	Route::post( 'preferences/save', [ SiteController::class, 'postSavePreferences' ] )->name( 'preferences.save' );
 
+	// Visa check.
+	Route::post( 'visa-check', [ SiteController::class, 'postVisaCheck' ] )->name( 'visa-check' );
+
 	// Auth:Login.
 	Route::post( 'login', [ AuthController::class, 'postLogin' ] )->name( 'login.post' );
 	Route::get( 'login/google', [ AuthController::class, 'getLoginWithGoogle' ] )->name( 'login.google' );

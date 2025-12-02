@@ -86,4 +86,32 @@ class SiteController extends Controller {
 
 		return redirect( $new_url );
 	}
+
+	public function postVisaCheck( Request $request ) {
+		$passport    = $request->input( 'passport' );
+		$destination = $request->input( 'destination' );
+
+		// Validate inputs.
+		$valid_countries = [ 'au', 'br', 'ca', 'co', 'fr', 'de', 'gb', 'us' ];
+
+		if ( ! in_array( $passport, $valid_countries ) || ! in_array( $destination, $valid_countries ) ) {
+			return redirect()->back()->withErrors( [
+				'visa_check' => __( 'Please select valid countries for both passport and destination.' )
+			] );
+		}
+
+		// Prevent same country selection.
+		if ( $passport === $destination ) {
+			return redirect()->back()->withErrors( [
+				'visa_check' => __( 'Your passport country and destination cannot be the same.' )
+			] );
+		}
+
+		// TODO: Implement visa requirements lookup and redirect to results page.
+		// For now, redirect back with success message.
+		return redirect()->back()->with( 'success', __( 'Visa check successful! Passport: :passport, Destination: :destination', [
+			'passport' => strtoupper( $passport ),
+			'destination' => strtoupper( $destination ),
+		] ) );
+	}
 }

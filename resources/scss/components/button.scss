@@ -9,7 +9,21 @@ a[role="button"], button, button[role="button"], button[type="button"], button[t
 	transition: .2s;
 	box-shadow: inset 0px 1px color-mix( in oklab, #fff 30%, transparent ) !important;
 	border-color: #015638;
-	background-color: $jade-450;
+	background-color: $jade-500;
+
+	&:hover {
+		background-color: $jade-450;
+
+		.icon-arrow-right {
+			g.head {
+				transform: translate(5px);
+			}
+
+			path.line {
+				transform: translate(5px) scaleX(1);
+			}
+		}
+	}
 
 	&:active {
 		transform: scale( .97 );
@@ -49,5 +63,18 @@ a[role="button"], button, button[role="button"], button[type="button"], button[t
 		display: flex;
 		align-items: center;
 		justify-content: center;
+	}
+
+	.icon-arrow-right {
+		g.head {
+			transform: translate( 0 );
+			transition: var( --3i-transition );
+		}
+
+		path.line {
+			transform: translate(0) scaleX(0);
+			transform-origin: 14px;
+			transition: var( --3i-transition );
+		}
 	}
 }
