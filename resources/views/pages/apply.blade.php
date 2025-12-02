@@ -100,5 +100,15 @@
 				</button>
 			</aside>
 		</div>
+
+		<div class="apply-mobile-submit display-mobile-only">
+			<button
+				type="submit"
+				form="apply-form"
+				class="apply-mobile-submit-button"
+			>
+				@lang( 'Start your application' )
+			</button>
+		</div>
 	</main>
 @endsection
