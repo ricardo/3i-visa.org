@@ -31,7 +31,7 @@ a[role="button"], button, button[role="button"], button[type="button"], button[t
 		border-color: oklch( 88% 0.003 48.717 );
 
 		&:hover {
-			background-color: #FAFAFA;
+			background-color: #F2F2F2;
 		}
 
 		@supports ( color: color-mix( in lab, green, green ) ) {
