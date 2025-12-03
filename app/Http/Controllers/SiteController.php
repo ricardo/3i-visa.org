@@ -338,11 +338,144 @@ class SiteController extends Controller {
 			return response()->json( [
 				'success' => true,
 				'message' => __( 'Traveler information saved!' ),
+				'redirect' => route( 'passport.details', [ 'country' => $country ] )
+			] );
+		}
+
+		// Redirect to passport details page (next step).
+		return redirect()->route( 'passport.details', [ 'country' => $country ] );
+	}
+
+	public function getPassportDetails( Request $request, $country ) {
+		// Slug to country code mapping.
+		$slug_to_code = [
+			'australia' => 'au',
+			'brazil' => 'br',
+			'canada' => 'ca',
+			'colombia' => 'co',
+			'france' => 'fr',
+			'germany' => 'de',
+			'united-kingdom' => 'gb',
+			'united-states' => 'us',
+		];
+
+		// Country code to name mapping.
+		$country_names = [
+			'au' => 'Australia',
+			'br' => 'Brazil',
+			'ca' => 'Canada',
+			'co' => 'Colombia',
+			'fr' => 'France',
+			'de' => 'Germany',
+			'gb' => 'United Kingdom',
+			'us' => 'United States',
+		];
+
+		// Get country code from slug.
+		$country_code = $slug_to_code[ $country ] ?? null;
+
+		if ( ! $country_code ) {
+			abort( 404 );
+		}
+
+		// Get visa application data from session.
+		$visa_data = $request->session()->get( 'visa_application', [] );
+		$travelers = $visa_data['travelers'] ?? null;
+
+		// If no travelers in session, redirect to application details page.
+		if ( ! $travelers ) {
+			return redirect()->route( 'application.details', [ 'country' => $country ] );
+		}
+
+		$applicants_count = count( $travelers );
+
+		// Pricing and currency conversion.
+		$base_price_usd = 49; // Base price per traveler in USD.
+		$user_currency = $request->cookie( 'preferred_currency', 'USD' );
+		$price_per_traveler = Currencies::convertFromUSD( $base_price_usd, $user_currency );
+		$currency_symbol = Currencies::getSymbol( $user_currency );
+
+		return view( 'pages.passport-details', [
+			'country_name' => $country_names[ $country_code ],
+			'country_code' => $country_code,
+			'country_slug' => $country,
+			'travelers' => $travelers,
+			'applicants_count' => $applicants_count,
+			'price_per_traveler' => $price_per_traveler,
+			'currency_symbol' => $currency_symbol,
+		] );
+	}
+
+	public function postPassportDetails( Request $request, $country ) {
+		// Get actual submitted travelers.
+		$submitted_travelers = $request->input( 'travelers', [] );
+
+		// Redirect back if no travelers submitted.
+		if ( empty( $submitted_travelers ) ) {
+			return redirect()->back()->withErrors( [
+				'travelers' => __( 'Please provide traveler passport information.' )
+			] );
+		}
+
+		// Build validation rules dynamically based on actual submitted traveler indices.
+		$rules = [];
+		$attributes = [];
+		$traveler_indices = array_keys( $submitted_travelers );
+
+		foreach ( $traveler_indices as $index ) {
+			// Nationality is always required.
+			$rules["travelers.{$index}.nationality"] = 'required|string|max:2';
+			$attributes["travelers.{$index}.nationality"] = 'nationality';
+
+			// Get the add_passport_later value for this traveler.
+			$add_later = $request->input( "travelers.{$index}.add_passport_later" );
+
+			// If NOT adding passport later, passport fields are required.
+			if ( ! $add_later ) {
+				$rules["travelers.{$index}.passport_number"] = 'required|string|max:255';
+				$rules["travelers.{$index}.passport_expiration_month"] = 'required|integer|min:1|max:12';
+				$rules["travelers.{$index}.passport_expiration_day"] = 'required|integer|min:1|max:31';
+				$rules["travelers.{$index}.passport_expiration_year"] = 'required|integer|min:' . date( 'Y' ) . '|max:' . ( date( 'Y' ) + 20 );
+
+				$attributes["travelers.{$index}.passport_number"] = 'passport number';
+				$attributes["travelers.{$index}.passport_expiration_month"] = 'passport expiration month';
+				$attributes["travelers.{$index}.passport_expiration_day"] = 'passport expiration day';
+				$attributes["travelers.{$index}.passport_expiration_year"] = 'passport expiration year';
+			}
+		}
+
+		// Validate inputs.
+		$request->validate( $rules, [], $attributes );
+
+		// Get existing visa application data from session.
+		$visa_data = $request->session()->get( 'visa_application', [] );
+
+		// Merge passport data with existing traveler data.
+		if ( isset( $visa_data['travelers'] ) ) {
+			foreach ( $submitted_travelers as $index => $passport_data ) {
+				if ( isset( $visa_data['travelers'][ $index ] ) ) {
+					$visa_data['travelers'][ $index ] = array_merge(
+						$visa_data['travelers'][ $index ],
+						$passport_data
+					);
+				}
+			}
+		}
+
+		// Save updated data back to session.
+		$request->session()->put( 'visa_application', $visa_data );
+
+		// Handle Ajax requests.
+		if ( $request->ajax() || $request->wantsJson() ) {
+			return response()->json( [
+				'success' => true,
+				'message' => __( 'Passport information saved!' ),
+				'redirect' => route( 'passport.details', [ 'country' => $country ] ) // TODO: Update to next step route
 			] );
 		}
 
 		// TODO: Redirect to next step (payment or confirmation).
 		// For now, redirect back with success message.
-		return redirect()->back()->with( 'success', __( 'Traveler information saved!' ) );
+		return redirect()->back()->with( 'success', __( 'Passport information saved!' ) );
 	}
 }

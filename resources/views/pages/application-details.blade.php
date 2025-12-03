@@ -113,10 +113,9 @@
 									}
 								);
 
-								// Success - could redirect or show success message
+								// Success - redirect to next step
 								if (response.data.success) {
-									// TODO: Redirect to next step or show success
-									console.log('Success:', response.data.message);
+									window.location.href = response.data.redirect;
 								}
 							} catch (error) {
 								if (error.response && error.response.status === 422) {

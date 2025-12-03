@@ -45,6 +45,10 @@ Route::group( [
 	Route::get( '{country}/application-details', [ SiteController::class, 'getApplicationDetails' ] )->name( 'application.details' );
 	Route::post( '{country}/application-details', [ SiteController::class, 'postApplicationDetails' ] )->name( 'application.details.submit' );
 
+	// Passport details page.
+	Route::get( '{country}/passport-details', [ SiteController::class, 'getPassportDetails' ] )->name( 'passport.details' );
+	Route::post( '{country}/passport-details', [ SiteController::class, 'postPassportDetails' ] )->name( 'passport.details.submit' );
+
 	// Auth:Login.
 	Route::post( 'login', [ AuthController::class, 'postLogin' ] )->name( 'login.post' );
 	Route::get( 'login/google', [ AuthController::class, 'getLoginWithGoogle' ] )->name( 'login.google' );
