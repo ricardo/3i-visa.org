@@ -47,10 +47,16 @@
 	--3i-form-element-border-color: #E7E5E4 !important;
 	--3i-form-element-active-border-color: rgb(90, 90, 90) !important;
 	--3i-form-element-focus-color: rgb(90, 90, 90) !important;
+	--3i-form-element-invalid-border-color: #DC2626 !important;
 
 	// --3i-h1-color: black !important;
+	--3i-text-selection-color: #{$jade-100} !important;
 
 }
+
+// ::selection {
+// 	color: white;
+// }
 
 // Body.
 html {

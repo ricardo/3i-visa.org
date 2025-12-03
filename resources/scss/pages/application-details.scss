@@ -22,14 +22,10 @@
 }
 
 .application-details-heading {
-	font-size: calc( var( --3i-font-size ) * 1.4 );
+	font-size: calc( var( --3i-font-size ) * .7 );
 	line-height: 1.2em;
 	font-weight: bold;
 	margin-bottom: 0;
-
-	@include respond-to( md ) {
-		font-size: calc( var( --3i-font-size ) * 1.1 );
-	}
 }
 
 .application-details-sidebar {
@@ -97,7 +93,7 @@
 	padding: calc( var( --3i-spacing ) * 2 );
 	display: grid;
 	grid-template-columns: 1fr 1fr;
-	gap: calc( var( --3i-spacing ) * 1.5 );
+	gap: calc( var( --3i-spacing ) * 1 );
 
 	@include respond-to( md, 'max' ) {
 		grid-template-columns: 1fr;
@@ -119,7 +115,8 @@
 	}
 
 	input[type="text"],
-	input[type="email"] {
+	input[type="email"],
+	select {
 		width: 100%;
 	}
 
@@ -223,5 +220,41 @@
 
 	@include respond-to( lg, 'max' ) {
 		width: 100%;
+	}
+}
+
+// Validation error banner
+.validation-error-banner {
+	scroll-margin-top: 80px;
+	background-color: #FEE2E2;
+	border-radius: var( --3i-border-radius );
+	padding: 1rem 1.5rem;
+	margin-bottom: calc( var( --3i-spacing ) * 2 );
+
+	.error-banner-content {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		font-size: .9rem;
+
+		.error-banner-icon {
+			flex-shrink: 0;
+			width: 1.5rem;
+			height: 1.5rem;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			svg {
+				width: 100%;
+				height: 100%;
+				color: #DC2626;
+			}
+		}
+
+		strong {
+			font-weight: 600;
+			margin: 0;
+		}
 	}
 }

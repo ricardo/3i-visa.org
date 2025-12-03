@@ -23,6 +23,9 @@
 	<div class="date-field">
 		<select
 			name="travelers[{{ $traveler_index }}][{{ $name }}_month]"
+			x-bind:aria-invalid="hasError('travelers.{{ $traveler_index }}.{{ $name }}_month') ? 'true' : null"
+			x-bind:aria-describedby="hasError('travelers.{{ $traveler_index }}.{{ $name }}_month') ? 'travelers-{{ $traveler_index }}-{{ $name }}-month-error' : null"
+			x-on:change="clearFieldError('travelers.{{ $traveler_index }}.{{ $name }}_month')"
 			{{ $required ? 'required' : '' }}
 		>
 			<option disabled value="" selected>@lang('Month')</option>
@@ -30,11 +33,21 @@
 				<option value="{{ $value }}">{{ $label }}</option>
 			@endforeach
 		</select>
+		<small
+			id="travelers-{{ $traveler_index }}-{{ $name }}-month-error"
+			class="error-message"
+			x-show="hasError('travelers.{{ $traveler_index }}.{{ $name }}_month')"
+			x-text="getError('travelers.{{ $traveler_index }}.{{ $name }}_month')"
+			x-transition
+		></small>
 	</div>
 
 	<div class="date-field">
 		<select
 			name="travelers[{{ $traveler_index }}][{{ $name }}_day]"
+			x-bind:aria-invalid="hasError('travelers.{{ $traveler_index }}.{{ $name }}_day') ? 'true' : null"
+			x-bind:aria-describedby="hasError('travelers.{{ $traveler_index }}.{{ $name }}_day') ? 'travelers-{{ $traveler_index }}-{{ $name }}-day-error' : null"
+			x-on:change="clearFieldError('travelers.{{ $traveler_index }}.{{ $name }}_day')"
 			{{ $required ? 'required' : '' }}
 		>
 			<option disabled value="" selected>@lang('Day')</option>
@@ -42,11 +55,21 @@
 				<option value="{{ $day }}">{{ $day }}</option>
 			@endfor
 		</select>
+		<small
+			id="travelers-{{ $traveler_index }}-{{ $name }}-day-error"
+			class="error-message"
+			x-show="hasError('travelers.{{ $traveler_index }}.{{ $name }}_day')"
+			x-text="getError('travelers.{{ $traveler_index }}.{{ $name }}_day')"
+			x-transition
+		></small>
 	</div>
 
 	<div class="date-field">
 		<select
 			name="travelers[{{ $traveler_index }}][{{ $name }}_year]"
+			x-bind:aria-invalid="hasError('travelers.{{ $traveler_index }}.{{ $name }}_year') ? 'true' : null"
+			x-bind:aria-describedby="hasError('travelers.{{ $traveler_index }}.{{ $name }}_year') ? 'travelers-{{ $traveler_index }}-{{ $name }}-year-error' : null"
+			x-on:change="clearFieldError('travelers.{{ $traveler_index }}.{{ $name }}_year')"
 			{{ $required ? 'required' : '' }}
 		>
 			<option disabled value="" selected>@lang('Year')</option>
@@ -54,5 +77,12 @@
 				<option value="{{ $year }}">{{ $year }}</option>
 			@endfor
 		</select>
+		<small
+			id="travelers-{{ $traveler_index }}-{{ $name }}-year-error"
+			class="error-message"
+			x-show="hasError('travelers.{{ $traveler_index }}.{{ $name }}_year')"
+			x-text="getError('travelers.{{ $traveler_index }}.{{ $name }}_year')"
+			x-transition
+		></small>
 	</div>
 </div>

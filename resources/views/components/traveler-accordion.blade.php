@@ -11,6 +11,25 @@
 			return this.firstName.trim()
 				? '@lang('Traveler') #' + this.sequentialNumber + ' - ' + this.firstName
 				: '@lang('Traveler') #' + this.sequentialNumber;
+		},
+		// Helper functions to access parent form data
+		getFormData() {
+			const form = this.$el.closest('form');
+			return form ? Alpine.$data(form) : null;
+		},
+		hasError(field) {
+			const formData = this.getFormData();
+			return formData ? formData.hasError(field) : false;
+		},
+		getError(field) {
+			const formData = this.getFormData();
+			return formData ? formData.getError(field) : '';
+		},
+		clearFieldError(field) {
+			const formData = this.getFormData();
+			if (formData) {
+				formData.clearFieldError(field);
+			}
 		}
 	}"
 	x-on:expand-traveler.window="if ($event.detail === {{ $traveler_index }}) { isOpen = true; }"
@@ -36,9 +55,18 @@
 					type="text"
 					name="travelers[{{ $traveler_index }}][first_name]"
 					x-model="firstName"
+					x-bind:aria-invalid="hasError('travelers.{{ $traveler_index }}.first_name') ? 'true' : null"
+					x-bind:aria-describedby="hasError('travelers.{{ $traveler_index }}.first_name') ? 'travelers-{{ $traveler_index }}-first-name-error' : null"
+					x-on:input="clearFieldError('travelers.{{ $traveler_index }}.first_name')"
 					placeholder="@lang('John William')"
-					required
 				>
+				<small
+					id="travelers-{{ $traveler_index }}-first-name-error"
+					class="error-message"
+					x-show="hasError('travelers.{{ $traveler_index }}.first_name')"
+					x-text="getError('travelers.{{ $traveler_index }}.first_name')"
+					x-transition
+				></small>
 			</div>
 
 			<!-- Last name -->
@@ -47,15 +75,24 @@
 				<input
 					type="text"
 					name="travelers[{{ $traveler_index }}][last_name]"
+					x-bind:aria-invalid="hasError('travelers.{{ $traveler_index }}.last_name') ? 'true' : null"
+					x-bind:aria-describedby="hasError('travelers.{{ $traveler_index }}.last_name') ? 'travelers-{{ $traveler_index }}-last-name-error' : null"
+					x-on:input="clearFieldError('travelers.{{ $traveler_index }}.last_name')"
 					placeholder="@lang('Smith')"
-					required
 				>
+				<small
+					id="travelers-{{ $traveler_index }}-last-name-error"
+					class="error-message"
+					x-show="hasError('travelers.{{ $traveler_index }}.last_name')"
+					x-text="getError('travelers.{{ $traveler_index }}.last_name')"
+					x-transition
+				></small>
 			</div>
 
 			<!-- Date of birth -->
 			<div class="traveler-field traveler-field-full">
 				<label>@lang('Date of birth')</label>
-				<x-date-selector :traveler_index="$traveler_index" name="date_of_birth" :required="true" />
+				<x-date-selector :traveler_index="$traveler_index" name="date_of_birth" :required="false" />
 			</div>
 
 			@if ( $is_first )
@@ -65,17 +102,25 @@
 					<input
 						type="email"
 						name="travelers[{{ $traveler_index }}][email]"
-						class="mb-1"
+						x-bind:aria-invalid="hasError('travelers.{{ $traveler_index }}.email') ? 'true' : null"
+						x-bind:aria-describedby="hasError('travelers.{{ $traveler_index }}.email') ? 'travelers-{{ $traveler_index }}-email-error' : null"
+						x-on:input="clearFieldError('travelers.{{ $traveler_index }}.email')"
 						placeholder="@lang('john@example.com')"
-						required
 					>
+					<small
+						id="travelers-{{ $traveler_index }}-email-error"
+						class="error-message"
+						x-show="hasError('travelers.{{ $traveler_index }}.email')"
+						x-text="getError('travelers.{{ $traveler_index }}.email')"
+						x-transition
+					></small>
 					<small class="traveler-field-info">
 						@lang('Your approved :country Check-MIG Form will be sent to this email address.', ['country' => session('visa_application.destination_name', 'Colombia')])
 					</small>
 				</div>
 
 				<!-- Marketing opt-in checkbox (first traveler only) -->
-				<div class="traveler-field traveler-field-full">
+				<div class="traveler-field traveler-field-full mt-5">
 					<label class="traveler-checkbox">
 						<input
 							type="checkbox"

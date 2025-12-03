@@ -274,29 +274,57 @@ class SiteController extends Controller {
 	}
 
 	public function postApplicationDetails( Request $request, $country ) {
-		// Get applicants count from session.
-		$applicants_count = $request->session()->get( 'visa_application.applicants', 1 );
+		// Get actual submitted travelers.
+		$submitted_travelers = $request->input( 'travelers', [] );
 
-		// Build validation rules dynamically based on applicants count.
+		// Redirect back if no travelers submitted.
+		if ( empty( $submitted_travelers ) ) {
+			return redirect()->back()->withErrors( [
+				'travelers' => __( 'Please provide at least one traveler.' )
+			] );
+		}
+
+		// Build validation rules dynamically based on actual submitted traveler indices.
 		$rules = [];
-		for ( $i = 1; $i <= $applicants_count; $i++ ) {
-			$rules["travelers.{$i}.first_name"] = 'required|string|max:255';
-			$rules["travelers.{$i}.last_name"] = 'required|string|max:255';
-			$rules["travelers.{$i}.date_of_birth_month"] = 'required|integer|min:1|max:12';
-			$rules["travelers.{$i}.date_of_birth_day"] = 'required|integer|min:1|max:31';
-			$rules["travelers.{$i}.date_of_birth_year"] = 'required|integer|min:' . ( date( 'Y' ) - 125 ) . '|max:' . date( 'Y' );
+		$attributes = [];
+		$traveler_indices = array_keys( $submitted_travelers );
+		$is_first_traveler = true;
+
+		foreach ( $traveler_indices as $index ) {
+			$rules["travelers.{$index}.first_name"] = 'required|string|max:255';
+			$rules["travelers.{$index}.last_name"] = 'required|string|max:255';
+			$rules["travelers.{$index}.date_of_birth_month"] = 'required|integer|min:1|max:12';
+			$rules["travelers.{$index}.date_of_birth_day"] = 'required|integer|min:1|max:31';
+			$rules["travelers.{$index}.date_of_birth_year"] = 'required|integer|min:' . ( date( 'Y' ) - 125 ) . '|max:' . date( 'Y' );
+
+			// Custom attribute names for cleaner error messages.
+			$attributes["travelers.{$index}.first_name"] = 'first name';
+			$attributes["travelers.{$index}.last_name"] = 'last name';
+			$attributes["travelers.{$index}.date_of_birth_month"] = 'birth month';
+			$attributes["travelers.{$index}.date_of_birth_day"] = 'birth day';
+			$attributes["travelers.{$index}.date_of_birth_year"] = 'birth year';
 
 			// Email required for first traveler only.
-			if ( $i === 1 ) {
-				$rules["travelers.{$i}.email"] = 'required|email|max:255';
+			if ( $is_first_traveler ) {
+				$rules["travelers.{$index}.email"] = 'required|email|max:255';
+				$attributes["travelers.{$index}.email"] = 'email';
+				$is_first_traveler = false;
 			}
 		}
 
 		// Validate inputs.
-		$request->validate( $rules );
+		$request->validate( $rules, [], $attributes );
 
 		// Store traveler data in session.
 		$request->session()->put( 'visa_application.travelers', $request->input( 'travelers' ) );
+
+		// Handle Ajax requests.
+		if ( $request->ajax() || $request->wantsJson() ) {
+			return response()->json( [
+				'success' => true,
+				'message' => __( 'Traveler information saved!' ),
+			] );
+		}
 
 		// TODO: Redirect to next step (payment or confirmation).
 		// For now, redirect back with success message.

@@ -4,10 +4,7 @@
 	<main class="container">
 		<div class="application-details-page">
 			<div class="application-details-content">
-				<h1 class="application-details-heading">
-					@lang( 'Traveler information' )
-				</h1>
-
+				<h1 class="application-details-heading">@lang( 'Colombia Check-MIG Form' )</h1>
 				<form
 					id="application-details-form"
 					action="{{ route( 'application.details.submit', [ 'country' => $country_slug ] ) }}"
@@ -16,6 +13,9 @@
 						activeTravelers: Array.from({ length: {{ $applicants_count }} }, (_, i) => i + 1),
 						maxTravelers: 10,
 						nextTravelerIndex: {{ $applicants_count + 1 }},
+						hasErrors: false,
+						errors: {},
+						isSubmitting: false,
 						init() {
 							this.$nextTick(() => {
 								this.broadcastSequentialNumbers();
@@ -50,11 +50,116 @@
 						},
 						isTravelerActive(index) {
 							return this.activeTravelers.includes(index);
+						},
+						async submitForm(event) {
+							event.preventDefault();
+
+							if (this.isSubmitting) return;
+
+							this.isSubmitting = true;
+							this.hasErrors = false;
+							this.errors = {};
+
+							// Get all form data
+							const formData = new FormData(event.target);
+
+							// Create new FormData with only active travelers
+							const filteredFormData = new FormData();
+
+							// Add CSRF token
+							filteredFormData.append('_token', formData.get('_token'));
+
+							// Only include data from active travelers
+							for (const [key, value] of formData.entries()) {
+								if (key === '_token') continue;
+
+								// Check if this is a traveler field
+								const match = key.match(/^travelers\[(\d+)\]/);
+								if (match) {
+									const travelerIndex = parseInt(match[1]);
+									// Only include if traveler is active
+									if (this.activeTravelers.includes(travelerIndex)) {
+										filteredFormData.append(key, value);
+									}
+								} else {
+									// Include non-traveler fields
+									filteredFormData.append(key, value);
+								}
+							}
+
+							try {
+								const response = await axios.post(
+									event.target.action,
+									filteredFormData,
+									{
+										headers: {
+											'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+											'Accept': 'application/json'
+										}
+									}
+								);
+
+								// Success - could redirect or show success message
+								if (response.data.success) {
+									// TODO: Redirect to next step or show success
+									console.log('Success:', response.data.message);
+								}
+							} catch (error) {
+								if (error.response && error.response.status === 422) {
+									// Validation errors
+									this.errors = error.response.data.errors;
+									this.hasErrors = true;
+
+									// Scroll to error banner
+									this.$nextTick(() => {
+										if (this.$refs.errorBanner) {
+											this.$refs.errorBanner.scrollIntoView({ behavior: 'smooth', block: 'start' });
+										}
+									});
+								}
+							} finally {
+								this.isSubmitting = false;
+							}
+						},
+						getError(field) {
+							return this.errors[field] ? this.errors[field][0] : '';
+						},
+						hasError(field) {
+							return !!this.errors[field];
+						},
+						clearFieldError(field) {
+							if (this.errors[field]) {
+								delete this.errors[field];
+								// Check if there are any errors left
+								if (Object.keys(this.errors).length === 0) {
+									this.hasErrors = false;
+								}
+							}
 						}
 					}"
 					x-on:remove-traveler.window="removeTraveler($event.detail)"
+					x-on:submit.prevent="submitForm($event)"
 				>
 					@csrf
+
+					<!-- Validation Error Banner -->
+					<div
+						x-show="hasErrors"
+						x-transition
+						class="validation-error-banner"
+						role="alert"
+						style="display: none;"
+						x-ref="errorBanner"
+					>
+						<div class="error-banner-content flex">
+							<div class="error-banner-icon">
+								@include( 'icons.warning' )
+							</div>
+							<div>
+								<strong>@lang( 'Please fix the fields highlighted in red' )</strong>
+							</div>
+						</div>
+					</div>
 
 					<!-- Traveler Accordions -->
 					<div class="travelers-list">
@@ -119,6 +224,7 @@
 					type="submit"
 					form="application-details-form"
 					class="apply-submit-button mb-0"
+					x-bind:aria-busy="isSubmitting"
 				>
 					@lang( 'Save and continue' )
 				</button>
@@ -131,6 +237,7 @@
 				type="submit"
 				form="application-details-form"
 				class="apply-mobile-submit-button"
+				x-bind:aria-busy="isSubmitting"
 			>
 				@lang( 'Save and continue' )
 			</button>
