@@ -111,7 +111,7 @@
 	label {
 		font-weight: 600;
 		color: var( --3i-h1-color );
-		margin-bottom: 0.25rem;
+		margin-bottom: 0;
 	}
 
 	input[type="text"],
@@ -428,6 +428,7 @@
 // Order Summary Card
 .order-summary-card {
 	background: #F8F9F9;
+	border: 1px solid var( --3i-border-color );
 	border-radius: var( --3i-border-radius );
 	padding: 1.5rem;
 	margin-bottom: 1.5rem;
@@ -466,30 +467,45 @@
 
 // Order Total Section
 .order-total-section {
-	border-top: 2px solid var( --3i-border-color );
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 	padding-top: 1.5rem;
+	padding-bottom: 1.5rem;
 	margin-bottom: 1.5rem;
-	text-align: center;
+	border-top: 2px solid var( --3i-border-color );
 }
 
 .order-total-label {
-	font-size: 0.85rem;
-	font-weight: 600;
-	color: var( --3i-muted-color );
-	text-transform: uppercase;
-	letter-spacing: 0.5px;
-	margin-bottom: 0.5rem;
-}
-
-.order-total-amount {
-	font-size: 1.5rem;
+	font-size: 1rem;
 	font-weight: 700;
 	color: var( --3i-h1-color );
-	margin-bottom: 0.25rem;
 }
 
-.order-total-subtext {
-	font-size: 0.85rem;
+.order-total-calculated {
+	font-size: 1rem;
+	font-weight: 600;
+	color: var( --3i-muted-color );
+}
+
+// Mobile Total Section
+.mobile-total-section {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding-bottom: .8rem;
+	background: white;
+}
+
+.mobile-total-label {
+	font-size: .85rem;
+	font-weight: 700;
+	color: var( --3i-h1-color );
+}
+
+.mobile-total-calculated {
+	font-size: .85rem;
+	font-weight: 600;
 	color: var( --3i-muted-color );
 }
 
@@ -498,8 +514,9 @@
 	display: flex;
 	gap: 1rem;
 	align-items: flex-start;
-	background: #F8F9F9;
-	border-radius: var( --3i-border-radius );
+	// background: #F8F9F9;
+	// border-radius: var( --3i-border-radius );
+	// border: 1px solid var( --3i-border-color );
 	padding: 1rem;
 	margin-top: 1.5rem;
 	margin-bottom: 1.5rem;

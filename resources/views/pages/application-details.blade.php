@@ -3,7 +3,7 @@
 @section( 'content' )
 	<!-- Mobile Progress Bar -->
 	<div class="display-mobile-only">
-		<x-mobile-progress-bar :current_step="3" :total_steps="4" />
+		<x-mobile-progress-bar :current_step="2.5" :total_steps="4" />
 	</div>
 
 	<main class="container">
@@ -230,10 +230,7 @@
 				<!-- Total Section -->
 				<div class="order-total-section">
 					<div class="order-total-label">@lang('Total')</div>
-					<div class="order-total-amount">
-						<span x-text="currencySymbol"></span><span x-text="totalPrice"></span>
-					</div>
-					<div class="order-total-subtext">@lang('For all travelers')</div>
+					<div class="order-total-calculated">@lang('Calculated at checkout')</div>
 				</div>
 
 				<!-- Save and Continue Button -->
@@ -267,6 +264,10 @@
 
 		<!-- Mobile/Tablet Fixed Bottom Button -->
 		<div class="apply-mobile-submit display-mobile-only">
+			<div class="mobile-total-section">
+				<div class="mobile-total-label">@lang('Total')</div>
+				<div class="mobile-total-calculated">@lang('Calculated at checkout')</div>
+			</div>
 			<button
 				type="submit"
 				form="application-details-form"
