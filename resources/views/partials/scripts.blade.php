@@ -18,8 +18,9 @@
 	{{-- Fix Livewire bug from Laravel 11 --}}
 	<script>
 		( function() {
+			const appLocale = "{{ app()->getLocale() }}";
 			const segment = window.location.pathname.split('/')[1];
-			const localePrefix = (segment && segment !== 'en') ? `/${segment}` : '';
+			const localePrefix = ( segment && appLocale !== 'en' ) ? `/${segment}` : '';
 
 			// Wait for DOM to load so we can modify the tag before Livewire boots
 			document.addEventListener( 'DOMContentLoaded', function() {

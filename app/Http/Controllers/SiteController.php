@@ -32,7 +32,9 @@ class SiteController extends Controller {
 		}
 
 		// Get the current path without locale.
-		$current_path = get_current_path_without_locale( route( $request->input( 'current_route' ) ) );
+		$route_name = $request->input( 'current_route' );
+		$route_params = json_decode( $request->input( 'route_params', '{}' ), true ) ?? [];
+		$current_path = get_current_path_without_locale( route( $route_name, $route_params ) );
 		$new_url      = get_localized_url( $new_locale, $current_path );
 
 		// Add locale to user's profile if logged in.
@@ -76,7 +78,9 @@ class SiteController extends Controller {
 		}
 
 		// Get the current path without locale.
-		$current_path = get_current_path_without_locale( route( $request->input( 'current_route' ) ) );
+		$route_name = $request->input( 'current_route' );
+		$route_params = json_decode( $request->input( 'route_params', '{}' ), true ) ?? [];
+		$current_path = get_current_path_without_locale( route( $route_name, $route_params ) );
 		$new_url      = get_localized_url( $new_locale, $current_path );
 
 		// Add locale to user's profile if logged in.
