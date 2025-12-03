@@ -217,10 +217,89 @@ class SiteController extends Controller {
 		$request->session()->put( 'visa_application.applicants', $applicants );
 		$request->session()->put( 'visa_application.nationality', $nationality );
 
-		// TODO: Redirect to next step (application form).
+		// Redirect to application details page.
+		return redirect()->route( 'application.details', [ 'country' => $country ] );
+	}
+
+	public function getApplicationDetails( Request $request, $country ) {
+		// Slug to country code mapping.
+		$slug_to_code = [
+			'australia' => 'au',
+			'brazil' => 'br',
+			'canada' => 'ca',
+			'colombia' => 'co',
+			'france' => 'fr',
+			'germany' => 'de',
+			'united-kingdom' => 'gb',
+			'united-states' => 'us',
+		];
+
+		// Country code to name mapping.
+		$country_names = [
+			'au' => 'Australia',
+			'br' => 'Brazil',
+			'ca' => 'Canada',
+			'co' => 'Colombia',
+			'fr' => 'France',
+			'de' => 'Germany',
+			'gb' => 'United Kingdom',
+			'us' => 'United States',
+		];
+
+		// Get country code from slug.
+		$country_code = $slug_to_code[ $country ] ?? null;
+
+		if ( ! $country_code ) {
+			abort( 404 );
+		}
+
+		// Get visa application data from session.
+		$visa_data = $request->session()->get( 'visa_application', [] );
+		$applicants_count = $visa_data['applicants'] ?? null;
+
+		// If no applicants count in session, redirect to apply page.
+		if ( ! $applicants_count ) {
+			return redirect()->route( 'apply', [ 'country' => $country ] );
+		}
+
+		// Store country name in session for use in form.
+		$request->session()->put( 'visa_application.destination_name', $country_names[ $country_code ] );
+
+		return view( 'pages.application-details', [
+			'country_name' => $country_names[ $country_code ],
+			'country_code' => $country_code,
+			'country_slug' => $country,
+			'applicants_count' => $applicants_count,
+		] );
+	}
+
+	public function postApplicationDetails( Request $request, $country ) {
+		// Get applicants count from session.
+		$applicants_count = $request->session()->get( 'visa_application.applicants', 1 );
+
+		// Build validation rules dynamically based on applicants count.
+		$rules = [];
+		for ( $i = 1; $i <= $applicants_count; $i++ ) {
+			$rules["travelers.{$i}.first_name"] = 'required|string|max:255';
+			$rules["travelers.{$i}.last_name"] = 'required|string|max:255';
+			$rules["travelers.{$i}.date_of_birth_month"] = 'required|integer|min:1|max:12';
+			$rules["travelers.{$i}.date_of_birth_day"] = 'required|integer|min:1|max:31';
+			$rules["travelers.{$i}.date_of_birth_year"] = 'required|integer|min:' . ( date( 'Y' ) - 125 ) . '|max:' . date( 'Y' );
+
+			// Email required for first traveler only.
+			if ( $i === 1 ) {
+				$rules["travelers.{$i}.email"] = 'required|email|max:255';
+			}
+		}
+
+		// Validate inputs.
+		$request->validate( $rules );
+
+		// Store traveler data in session.
+		$request->session()->put( 'visa_application.travelers', $request->input( 'travelers' ) );
+
+		// TODO: Redirect to next step (payment or confirmation).
 		// For now, redirect back with success message.
-		return redirect()->back()->with( 'success', __( 'Application started! Applicants: :count', [
-			'count' => $applicants,
-		] ) );
+		return redirect()->back()->with( 'success', __( 'Traveler information saved!' ) );
 	}
 }

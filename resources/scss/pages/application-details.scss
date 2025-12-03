@@ -1,0 +1,227 @@
+@use "@picocss/pico/scss/colors" as *;
+@use "../mixins" as *;
+
+.application-details-page {
+	display: grid;
+	grid-template-columns: 1fr 320px;
+	gap: 5rem;
+	margin-top: calc( var( --3i-spacing ) * 2 );
+	margin-bottom: calc( var( --3i-spacing ) * 4 );
+
+	@include respond-to( lg, 'max' ) {
+		grid-template-columns: 1fr;
+		gap: 2rem;
+		padding-bottom: 5rem; // Space for fixed mobile button
+	}
+}
+
+.application-details-content {
+	display: flex;
+	flex-direction: column;
+	gap: calc( var( --3i-spacing ) * 2 );
+}
+
+.application-details-heading {
+	font-size: calc( var( --3i-font-size ) * 1.4 );
+	line-height: 1.2em;
+	font-weight: bold;
+	margin-bottom: 0;
+
+	@include respond-to( md ) {
+		font-size: calc( var( --3i-font-size ) * 1.1 );
+	}
+}
+
+.application-details-sidebar {
+	@include respond-to( lg, 'max' ) {
+		order: -1;
+	}
+}
+
+// Travelers list
+.travelers-list {
+	display: flex;
+	flex-direction: column;
+	gap: calc( var( --3i-spacing ) * 1.5 );
+}
+
+// Traveler Accordion
+.traveler-accordion {
+	border: 1px solid var( --3i-border-color );
+	border-radius: var( --3i-border-radius );
+	overflow: hidden;
+}
+
+.traveler-accordion-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 1rem 1.5rem;
+	cursor: pointer;
+	user-select: none;
+	background: #F8F9F9;
+}
+
+.traveler-accordion-title {
+	font-size: .9rem;
+	font-weight: 700;
+	margin: 0;
+	color: var( --3i-h1-color );
+}
+
+.traveler-accordion-icon {
+	width: 1.5rem;
+	height: 1.5rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: transform 0.3s ease;
+	flex-shrink: 0;
+
+	svg {
+		width: 1.2rem;
+		height: 1.2rem;
+		color: var( --3i-h1-color );
+	}
+
+	&.rotated {
+		transform: rotate( 180deg );
+	}
+}
+
+.traveler-accordion-content {
+	border-top: 1px solid var( --3i-border-color );
+}
+
+.traveler-accordion-body {
+	padding: calc( var( --3i-spacing ) * 2 );
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: calc( var( --3i-spacing ) * 1.5 );
+
+	@include respond-to( md, 'max' ) {
+		grid-template-columns: 1fr;
+		padding: calc( var( --3i-spacing ) * 1.5 );
+		gap: calc( var( --3i-spacing ) * 1.2 );
+	}
+}
+
+// Traveler fields
+.traveler-field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+
+	label {
+		font-weight: 600;
+		color: var( --3i-h1-color );
+		margin-bottom: 0.25rem;
+	}
+
+	input[type="text"],
+	input[type="email"] {
+		width: 100%;
+	}
+
+	&-full {
+		grid-column: 1 / -1;
+	}
+}
+
+.traveler-field-info {
+	color: var( --3i-muted-color );
+	margin-top: 0.25rem;
+	line-height: 1.4;
+}
+
+// Date selector
+.date-selector {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	gap: 1rem;
+
+	@include respond-to( md, 'max' ) {
+		gap: 0.75rem;
+	}
+}
+
+.date-field {
+	select {
+		width: 100%;
+
+		// Style for placeholder-like appearance when disabled option is selected
+		&:invalid,
+		&:has(option[disabled]:checked) {
+			color: rgba( 0, 0, 0, .3 ) !important;
+		}
+
+		// Reset color when valid option is selected
+		&:valid {
+			color: var( --3i-font-color );
+		}
+
+		// Style the disabled placeholder options
+		option[disabled] {
+			color: rgba( 0, 0, 0, .3 );
+		}
+
+		// Style regular options
+		option:not([disabled]) {
+			color: var( --3i-font-color );
+		}
+	}
+}
+
+.traveler-checkbox {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.75rem;
+	cursor: pointer;
+	margin-bottom: 0;
+
+	input[type="checkbox"] {
+		margin-top: 0.25rem;
+		flex-shrink: 0;
+	}
+
+	span {
+		font-size: 0.85rem;
+		line-height: 1.4;
+		color: var( --3i-muted-color );
+		font-weight: 400;
+	}
+}
+
+// Remove traveler link
+.traveler-remove-link {
+	color: $red-400;
+	font-size: .8rem !important;
+	font-weight: 600;
+	background: white !important;
+	border: 0px;
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	transition: color 0.2s ease;
+
+	border-top: 1px solid var( --3i-form-element-border-color ) !important;
+	border-radius: 0 !important;
+
+	margin-bottom: -1rem;
+}
+
+// Add traveler button
+.add-traveler-button {
+	color: #394FE1;
+	padding: 1rem 2rem;
+	font-size: .8rem !important;
+	font-weight: 600;
+	background: #CDDBFF !important;
+	border: 0px;
+	margin-top: calc( var( --3i-spacing ) * 1.5 );
+
+	@include respond-to( lg, 'max' ) {
+		width: 100%;
+	}
+}

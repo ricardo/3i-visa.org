@@ -11,6 +11,10 @@ input:not([type=checkbox], [type=radio]), select, textarea, details.dropdown sum
 
 	// Change placeholder color.
 	&::placeholder {
-		color: var( --3i-muted-color );
+		color: rgba( 0, 0, 0, .3 ) !important;
 	}
+}
+
+input[type=checkbox] {
+	border-radius: .3rem;
 }
