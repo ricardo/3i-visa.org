@@ -1,18 +1,32 @@
 @extends( 'layouts/main', [ 'footer' => false ] )
 @section( 'title', __( 'Application Details' ) . ' • 3i Visa' )
 @section( 'content' )
+	<!-- Mobile Progress Bar -->
+	<div class="display-mobile-only">
+		<x-mobile-progress-bar :current_step="3" :total_steps="4" />
+	</div>
+
 	<main class="container">
-		<div class="application-details-page">
-			<div class="application-details-content">
-				<h1 class="application-details-heading">@lang( 'Colombia Check-MIG Form' )</h1>
-				<form
-					id="application-details-form"
-					action="{{ route( 'application.details.submit', [ 'country' => $country_slug ] ) }}"
-					method="POST"
-					x-data="{
-						activeTravelers: Array.from({ length: {{ $applicants_count }} }, (_, i) => i + 1),
-						maxTravelers: 10,
-						nextTravelerIndex: {{ $applicants_count + 1 }},
+		<!-- Main Page Title -->
+		<h1 class="application-details-main-title">@lang( ':country Check-MIG Form', [ 'country' => $country_name ] )</h1>
+
+		<!-- Progress Steps (Desktop Only) -->
+		<div class="display-desktop-only">
+			<x-progress-steps :current_step="2" />
+		</div>
+
+		<div class="application-details-page" x-data="{
+					pricePerTraveler: {{ $price_per_traveler }},
+					currencySymbol: '{{ $currency_symbol }}',
+					activeTravelers: Array.from({ length: {{ $applicants_count }} }, (_, i) => i + 1),
+					maxTravelers: 10,
+					nextTravelerIndex: {{ $applicants_count + 1 }},
+					get travelerCount() {
+						return this.activeTravelers.length;
+					},
+					get totalPrice() {
+						return (this.activeTravelers.length * this.pricePerTraveler).toFixed(2);
+					},
 						hasErrors: false,
 						errors: {},
 						isSubmitting: false,
@@ -138,6 +152,12 @@
 						}
 					}"
 					x-on:remove-traveler.window="removeTraveler($event.detail)"
+				>
+			<div class="application-details-content">
+				<form
+					id="application-details-form"
+					action="{{ route( 'application.details.submit', [ 'country' => $country_slug ] ) }}"
+					method="POST"
 					x-on:submit.prevent="submitForm($event)"
 				>
 					@csrf
@@ -159,6 +179,12 @@
 								<strong>@lang( 'Please fix the fields highlighted in red' )</strong>
 							</div>
 						</div>
+					</div>
+
+					<!-- Page Title and Subtitle -->
+					<div class="application-details-title">
+						<h1 class="application-details-heading">@lang( 'Your personal details' )</h1>
+						<p class="application-details-subtitle">@lang( 'Enter the details as they appear on your passport.' )</p>
 					</div>
 
 					<!-- Traveler Accordions -->
@@ -183,43 +209,34 @@
 				</form>
 			</div>
 
-			<!-- Info Card Sidebar -->
+			<!-- Order Summary Sidebar -->
 			<aside class="application-details-sidebar display-desktop-only">
-				<div class="apply-info-card">
-					<h3>@lang( ':country Check-MIG Form', [ 'country' => $country_name ] )</h3>
-
-					<div class="apply-info-items">
-						<div class="apply-info-item">
-							<div class="apply-info-icon">
-								@include( 'icons.calendar' )
-							</div>
-							<div class="apply-info-details">
-								<div class="apply-info-label">@lang( 'Valid for' )</div>
-								<div class="apply-info-value">@lang( '90 days after arrival' )</div>
-							</div>
+				<!-- Order Summary Card -->
+				<div class="order-summary-card">
+					<div class="order-summary-row">
+						<div class="order-summary-title">@lang(':country Check-MIG Form', ['country' => $country_name])</div>
+						<div class="order-summary-value">
+							<span x-text="travelerCount"></span> <span x-text="travelerCount === 1 ? '@lang('traveler')' : '@lang('travelers')'"></span>
 						</div>
-
-						<div class="apply-info-item">
-							<div class="apply-info-icon">
-								@include( 'icons.airplane-landing' )
-							</div>
-							<div class="apply-info-details">
-								<div class="apply-info-label">@lang( 'Number of entries' )</div>
-								<div class="apply-info-value">@lang( 'Single entry' )</div>
-							</div>
-						</div>
-
-						<div class="apply-info-item">
-							<div class="apply-info-icon">
-								@include( 'icons.calendar-clock' )
-							</div>
-							<div class="apply-info-details">
-								<div class="apply-info-label">@lang( 'Max stay' )</div>
-								<div class="apply-info-value">@lang( '90 days per entry' )</div>
-							</div>
+					</div>
+					<div class="order-summary-row">
+						<div class="order-summary-label">@lang('Standard processing')</div>
+						<div class="order-summary-value">
+							<span x-text="currencySymbol"></span><span x-text="totalPrice"></span>
 						</div>
 					</div>
 				</div>
+
+				<!-- Total Section -->
+				<div class="order-total-section">
+					<div class="order-total-label">@lang('Total')</div>
+					<div class="order-total-amount">
+						<span x-text="currencySymbol"></span><span x-text="totalPrice"></span>
+					</div>
+					<div class="order-total-subtext">@lang('For all travelers')</div>
+				</div>
+
+				<!-- Save and Continue Button -->
 				<button
 					type="submit"
 					form="application-details-form"
@@ -228,6 +245,23 @@
 				>
 					@lang( 'Save and continue' )
 				</button>
+
+				<!-- Security Message -->
+				<div class="security-message">
+					<div class="security-message-icon">
+						@include('icons.shield-check')
+					</div>
+					<div class="security-message-text">
+						<strong>@lang('We take strong measures to protect your information.')</strong>
+						<p>@lang('For more details see') <a href="#">@lang('how we keep your data safe')</a></p>
+					</div>
+				</div>
+
+				<!-- Previous Link -->
+				<a href="{{ route('apply', ['country' => $country_slug]) }}" class="previous-link">
+					@include('icons.arrow-left', ['class' => 'mr-2'])
+					@lang('Previous')
+				</a>
 			</aside>
 		</div>
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Currencies;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 
@@ -265,11 +266,21 @@ class SiteController extends Controller {
 		// Store country name in session for use in form.
 		$request->session()->put( 'visa_application.destination_name', $country_names[ $country_code ] );
 
+		// Pricing and currency conversion.
+		$base_price_usd = 49; // Base price per traveler in USD.
+		$user_currency = $request->cookie( 'preferred_currency', 'USD' );
+		$price_per_traveler = Currencies::convertFromUSD( $base_price_usd, $user_currency );
+		$total_price = $price_per_traveler * $applicants_count;
+		$currency_symbol = Currencies::getSymbol( $user_currency );
+
 		return view( 'pages.application-details', [
 			'country_name' => $country_names[ $country_code ],
 			'country_code' => $country_code,
 			'country_slug' => $country,
 			'applicants_count' => $applicants_count,
+			'price_per_traveler' => $price_per_traveler,
+			'total_price' => $total_price,
+			'currency_symbol' => $currency_symbol,
 		] );
 	}
 
