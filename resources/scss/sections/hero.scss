@@ -111,13 +111,6 @@ section.hero {
 		[aria-invalid="true"] {
 			--3i-border-color: var( --3i-form-element-invalid-border-color );
 		}
-
-		small.error-message {
-			display: block;
-			margin-top: 0.25rem;
-			color: var( --3i-form-element-invalid-border-color );
-			font-size: 0.875rem;
-		}
 	}
 
 	.hero-submit-button {

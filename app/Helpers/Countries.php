@@ -5,207 +5,147 @@ namespace App\Helpers;
 class Countries {
 
 	/**
-	 * Get list of all countries with ISO codes
+	 * Get priority country codes (main visa destinations)
+	 *
+	 * @return array Array of priority country codes
+	 */
+	public static function getPriorityCountries() {
+		return [ 'br', 'us', 'ca', 'co', 'au', 'fr', 'de', 'gb' ];
+	}
+
+	/**
+	 * Get all country codes
+	 *
+	 * @return array Array of all ISO country codes
+	 */
+	private static function getAllCountryCodes() {
+		return [
+			'af', 'al', 'dz', 'ad', 'ao', 'ag', 'ar', 'am', 'au', 'at',
+			'az', 'bs', 'bh', 'bd', 'bb', 'by', 'be', 'bz', 'bj', 'bt',
+			'bo', 'ba', 'bw', 'br', 'bn', 'bg', 'bf', 'bi', 'kh', 'cm',
+			'ca', 'cv', 'cf', 'td', 'cl', 'cn', 'co', 'km', 'cg', 'cr',
+			'hr', 'cu', 'cy', 'cz', 'dk', 'dj', 'dm', 'do', 'tl', 'ec',
+			'eg', 'sv', 'gq', 'er', 'ee', 'et', 'fj', 'fi', 'fr', 'ga',
+			'gm', 'ge', 'de', 'gh', 'gr', 'gd', 'gt', 'gn', 'gw', 'gy',
+			'ht', 'hn', 'hu', 'is', 'in', 'id', 'ir', 'iq', 'ie', 'il',
+			'it', 'ci', 'jm', 'jp', 'jo', 'kz', 'ke', 'ki', 'kw', 'kg',
+			'la', 'lv', 'lb', 'ls', 'lr', 'ly', 'li', 'lt', 'lu', 'mk',
+			'mg', 'mw', 'my', 'mv', 'ml', 'mt', 'mh', 'mr', 'mu', 'mx',
+			'fm', 'md', 'mc', 'mn', 'me', 'ma', 'mz', 'mm', 'na', 'nr',
+			'np', 'nl', 'nz', 'ni', 'ne', 'ng', 'kp', 'no', 'om', 'pk',
+			'pw', 'ps', 'pa', 'pg', 'py', 'pe', 'ph', 'pl', 'pt', 'qa',
+			'ro', 'ru', 'rw', 'kn', 'lc', 'vc', 'ws', 'sm', 'st', 'sa',
+			'sn', 'rs', 'sc', 'sl', 'sg', 'sk', 'si', 'sb', 'so', 'za',
+			'kr', 'ss', 'es', 'lk', 'sd', 'sr', 'sz', 'se', 'ch', 'sy',
+			'tw', 'tj', 'tz', 'th', 'tg', 'to', 'tt', 'tn', 'tr', 'tm',
+			'tv', 'ug', 'ua', 'ae', 'gb', 'us', 'uy', 'uz', 'vu', 'va',
+			've', 'vn', 'ye', 'zm', 'zw',
+		];
+	}
+
+	/**
+	 * Get list of all countries with ISO codes, translated and sorted
+	 *
+	 * Priority countries (visa destinations) appear first, followed by
+	 * all other countries sorted alphabetically by translated name
 	 *
 	 * @return array Array of countries with 'name' and 'code' keys
 	 */
 	public static function getCountries() {
+		$country_codes = self::getAllCountryCodes();
+		$priority_codes = self::getPriorityCountries();
+		$translations = trans('countries');
+
+		// Build array with country code => translated name
+		$countries = [];
+		foreach ( $country_codes as $code ) {
+			if ( isset( $translations[ $code ] ) ) {
+				$countries[] = [
+					'name' => $translations[ $code ],
+					'code' => $code,
+					'is_priority' => in_array( $code, $priority_codes ),
+				];
+			}
+		}
+
+		// Sort: priority countries first, then alphabetically by name
+		usort( $countries, function ( $a, $b ) {
+			// Priority countries come first
+			if ( $a['is_priority'] && ! $b['is_priority'] ) {
+				return -1;
+			}
+			if ( ! $a['is_priority'] && $b['is_priority'] ) {
+				return 1;
+			}
+
+			// Within same priority level, sort alphabetically
+			return strcasecmp( $a['name'], $b['name'] );
+		} );
+
+		// Remove the is_priority flag before returning
+		$countries = array_map( function ( $country ) {
+			return [
+				'name' => $country['name'],
+				'code' => $country['code'],
+			];
+		}, $countries );
+
+		return $countries;
+	}
+
+	/**
+	 * Get list of main visa destination countries
+	 *
+	 * @return array Array of visa destination countries with 'name' and 'code' keys
+	 */
+	public static function getVisaCountries() {
+		$priority_codes = self::getPriorityCountries();
+		$translations = trans('countries');
+		$countries = [];
+
+		foreach ( $priority_codes as $code ) {
+			if ( isset( $translations[ $code ] ) ) {
+				$countries[] = [
+					'name' => $translations[ $code ],
+					'code' => $code,
+				];
+			}
+		}
+
+		// Sort alphabetically by translated name
+		usort( $countries, function ( $a, $b ) {
+			return strcasecmp( $a['name'], $b['name'] );
+		} );
+
+		return $countries;
+	}
+
+	/**
+	 * Get translated name for a specific country code
+	 *
+	 * @param string $code ISO country code
+	 * @return string Translated country name or empty string if not found
+	 */
+	public static function getCountryName( $code ) {
+		$translations = trans('countries');
+		return $translations[ $code ] ?? '';
+	}
+
+	/**
+	 * Get country code to slug mapping for visa destinations
+	 *
+	 * @return array Associative array of country code => slug
+	 */
+	public static function getCountrySlugs() {
 		return [
-			[ 'name' => 'Afghanistan', 'code' => 'af' ],
-			[ 'name' => 'Albania', 'code' => 'al' ],
-			[ 'name' => 'Algeria', 'code' => 'dz' ],
-			[ 'name' => 'Andorra', 'code' => 'ad' ],
-			[ 'name' => 'Angola', 'code' => 'ao' ],
-			[ 'name' => 'Antigua and Barbuda', 'code' => 'ag' ],
-			[ 'name' => 'Argentina', 'code' => 'ar' ],
-			[ 'name' => 'Armenia', 'code' => 'am' ],
-			[ 'name' => 'Australia', 'code' => 'au' ],
-			[ 'name' => 'Austria', 'code' => 'at' ],
-			[ 'name' => 'Azerbaijan', 'code' => 'az' ],
-			[ 'name' => 'Bahamas', 'code' => 'bs' ],
-			[ 'name' => 'Bahrain', 'code' => 'bh' ],
-			[ 'name' => 'Bangladesh', 'code' => 'bd' ],
-			[ 'name' => 'Barbados', 'code' => 'bb' ],
-			[ 'name' => 'Belarus', 'code' => 'by' ],
-			[ 'name' => 'Belgium', 'code' => 'be' ],
-			[ 'name' => 'Belize', 'code' => 'bz' ],
-			[ 'name' => 'Benin', 'code' => 'bj' ],
-			[ 'name' => 'Bhutan', 'code' => 'bt' ],
-			[ 'name' => 'Bolivia', 'code' => 'bo' ],
-			[ 'name' => 'Bosnia and Herzegovina', 'code' => 'ba' ],
-			[ 'name' => 'Botswana', 'code' => 'bw' ],
-			[ 'name' => 'Brazil', 'code' => 'br' ],
-			[ 'name' => 'Brunei', 'code' => 'bn' ],
-			[ 'name' => 'Bulgaria', 'code' => 'bg' ],
-			[ 'name' => 'Burkina Faso', 'code' => 'bf' ],
-			[ 'name' => 'Burundi', 'code' => 'bi' ],
-			[ 'name' => 'Cambodia', 'code' => 'kh' ],
-			[ 'name' => 'Cameroon', 'code' => 'cm' ],
-			[ 'name' => 'Canada', 'code' => 'ca' ],
-			[ 'name' => 'Cape Verde', 'code' => 'cv' ],
-			[ 'name' => 'Central African Republic', 'code' => 'cf' ],
-			[ 'name' => 'Chad', 'code' => 'td' ],
-			[ 'name' => 'Chile', 'code' => 'cl' ],
-			[ 'name' => 'China', 'code' => 'cn' ],
-			[ 'name' => 'Colombia', 'code' => 'co' ],
-			[ 'name' => 'Comoros', 'code' => 'km' ],
-			[ 'name' => 'Congo', 'code' => 'cg' ],
-			[ 'name' => 'Costa Rica', 'code' => 'cr' ],
-			[ 'name' => 'Croatia', 'code' => 'hr' ],
-			[ 'name' => 'Cuba', 'code' => 'cu' ],
-			[ 'name' => 'Cyprus', 'code' => 'cy' ],
-			[ 'name' => 'Czech Republic', 'code' => 'cz' ],
-			[ 'name' => 'Denmark', 'code' => 'dk' ],
-			[ 'name' => 'Djibouti', 'code' => 'dj' ],
-			[ 'name' => 'Dominica', 'code' => 'dm' ],
-			[ 'name' => 'Dominican Republic', 'code' => 'do' ],
-			[ 'name' => 'East Timor', 'code' => 'tl' ],
-			[ 'name' => 'Ecuador', 'code' => 'ec' ],
-			[ 'name' => 'Egypt', 'code' => 'eg' ],
-			[ 'name' => 'El Salvador', 'code' => 'sv' ],
-			[ 'name' => 'Equatorial Guinea', 'code' => 'gq' ],
-			[ 'name' => 'Eritrea', 'code' => 'er' ],
-			[ 'name' => 'Estonia', 'code' => 'ee' ],
-			[ 'name' => 'Ethiopia', 'code' => 'et' ],
-			[ 'name' => 'Fiji', 'code' => 'fj' ],
-			[ 'name' => 'Finland', 'code' => 'fi' ],
-			[ 'name' => 'France', 'code' => 'fr' ],
-			[ 'name' => 'Gabon', 'code' => 'ga' ],
-			[ 'name' => 'Gambia', 'code' => 'gm' ],
-			[ 'name' => 'Georgia', 'code' => 'ge' ],
-			[ 'name' => 'Germany', 'code' => 'de' ],
-			[ 'name' => 'Ghana', 'code' => 'gh' ],
-			[ 'name' => 'Greece', 'code' => 'gr' ],
-			[ 'name' => 'Grenada', 'code' => 'gd' ],
-			[ 'name' => 'Guatemala', 'code' => 'gt' ],
-			[ 'name' => 'Guinea', 'code' => 'gn' ],
-			[ 'name' => 'Guinea-Bissau', 'code' => 'gw' ],
-			[ 'name' => 'Guyana', 'code' => 'gy' ],
-			[ 'name' => 'Haiti', 'code' => 'ht' ],
-			[ 'name' => 'Honduras', 'code' => 'hn' ],
-			[ 'name' => 'Hungary', 'code' => 'hu' ],
-			[ 'name' => 'Iceland', 'code' => 'is' ],
-			[ 'name' => 'India', 'code' => 'in' ],
-			[ 'name' => 'Indonesia', 'code' => 'id' ],
-			[ 'name' => 'Iran', 'code' => 'ir' ],
-			[ 'name' => 'Iraq', 'code' => 'iq' ],
-			[ 'name' => 'Ireland', 'code' => 'ie' ],
-			[ 'name' => 'Israel', 'code' => 'il' ],
-			[ 'name' => 'Italy', 'code' => 'it' ],
-			[ 'name' => 'Ivory Coast', 'code' => 'ci' ],
-			[ 'name' => 'Jamaica', 'code' => 'jm' ],
-			[ 'name' => 'Japan', 'code' => 'jp' ],
-			[ 'name' => 'Jordan', 'code' => 'jo' ],
-			[ 'name' => 'Kazakhstan', 'code' => 'kz' ],
-			[ 'name' => 'Kenya', 'code' => 'ke' ],
-			[ 'name' => 'Kiribati', 'code' => 'ki' ],
-			[ 'name' => 'Kuwait', 'code' => 'kw' ],
-			[ 'name' => 'Kyrgyzstan', 'code' => 'kg' ],
-			[ 'name' => 'Laos', 'code' => 'la' ],
-			[ 'name' => 'Latvia', 'code' => 'lv' ],
-			[ 'name' => 'Lebanon', 'code' => 'lb' ],
-			[ 'name' => 'Lesotho', 'code' => 'ls' ],
-			[ 'name' => 'Liberia', 'code' => 'lr' ],
-			[ 'name' => 'Libya', 'code' => 'ly' ],
-			[ 'name' => 'Liechtenstein', 'code' => 'li' ],
-			[ 'name' => 'Lithuania', 'code' => 'lt' ],
-			[ 'name' => 'Luxembourg', 'code' => 'lu' ],
-			[ 'name' => 'Macedonia', 'code' => 'mk' ],
-			[ 'name' => 'Madagascar', 'code' => 'mg' ],
-			[ 'name' => 'Malawi', 'code' => 'mw' ],
-			[ 'name' => 'Malaysia', 'code' => 'my' ],
-			[ 'name' => 'Maldives', 'code' => 'mv' ],
-			[ 'name' => 'Mali', 'code' => 'ml' ],
-			[ 'name' => 'Malta', 'code' => 'mt' ],
-			[ 'name' => 'Marshall Islands', 'code' => 'mh' ],
-			[ 'name' => 'Mauritania', 'code' => 'mr' ],
-			[ 'name' => 'Mauritius', 'code' => 'mu' ],
-			[ 'name' => 'Mexico', 'code' => 'mx' ],
-			[ 'name' => 'Micronesia', 'code' => 'fm' ],
-			[ 'name' => 'Moldova', 'code' => 'md' ],
-			[ 'name' => 'Monaco', 'code' => 'mc' ],
-			[ 'name' => 'Mongolia', 'code' => 'mn' ],
-			[ 'name' => 'Montenegro', 'code' => 'me' ],
-			[ 'name' => 'Morocco', 'code' => 'ma' ],
-			[ 'name' => 'Mozambique', 'code' => 'mz' ],
-			[ 'name' => 'Myanmar', 'code' => 'mm' ],
-			[ 'name' => 'Namibia', 'code' => 'na' ],
-			[ 'name' => 'Nauru', 'code' => 'nr' ],
-			[ 'name' => 'Nepal', 'code' => 'np' ],
-			[ 'name' => 'Netherlands', 'code' => 'nl' ],
-			[ 'name' => 'New Zealand', 'code' => 'nz' ],
-			[ 'name' => 'Nicaragua', 'code' => 'ni' ],
-			[ 'name' => 'Niger', 'code' => 'ne' ],
-			[ 'name' => 'Nigeria', 'code' => 'ng' ],
-			[ 'name' => 'North Korea', 'code' => 'kp' ],
-			[ 'name' => 'Norway', 'code' => 'no' ],
-			[ 'name' => 'Oman', 'code' => 'om' ],
-			[ 'name' => 'Pakistan', 'code' => 'pk' ],
-			[ 'name' => 'Palau', 'code' => 'pw' ],
-			[ 'name' => 'Palestine', 'code' => 'ps' ],
-			[ 'name' => 'Panama', 'code' => 'pa' ],
-			[ 'name' => 'Papua New Guinea', 'code' => 'pg' ],
-			[ 'name' => 'Paraguay', 'code' => 'py' ],
-			[ 'name' => 'Peru', 'code' => 'pe' ],
-			[ 'name' => 'Philippines', 'code' => 'ph' ],
-			[ 'name' => 'Poland', 'code' => 'pl' ],
-			[ 'name' => 'Portugal', 'code' => 'pt' ],
-			[ 'name' => 'Qatar', 'code' => 'qa' ],
-			[ 'name' => 'Romania', 'code' => 'ro' ],
-			[ 'name' => 'Russia', 'code' => 'ru' ],
-			[ 'name' => 'Rwanda', 'code' => 'rw' ],
-			[ 'name' => 'Saint Kitts and Nevis', 'code' => 'kn' ],
-			[ 'name' => 'Saint Lucia', 'code' => 'lc' ],
-			[ 'name' => 'Saint Vincent and the Grenadines', 'code' => 'vc' ],
-			[ 'name' => 'Samoa', 'code' => 'ws' ],
-			[ 'name' => 'San Marino', 'code' => 'sm' ],
-			[ 'name' => 'Sao Tome and Principe', 'code' => 'st' ],
-			[ 'name' => 'Saudi Arabia', 'code' => 'sa' ],
-			[ 'name' => 'Senegal', 'code' => 'sn' ],
-			[ 'name' => 'Serbia', 'code' => 'rs' ],
-			[ 'name' => 'Seychelles', 'code' => 'sc' ],
-			[ 'name' => 'Sierra Leone', 'code' => 'sl' ],
-			[ 'name' => 'Singapore', 'code' => 'sg' ],
-			[ 'name' => 'Slovakia', 'code' => 'sk' ],
-			[ 'name' => 'Slovenia', 'code' => 'si' ],
-			[ 'name' => 'Solomon Islands', 'code' => 'sb' ],
-			[ 'name' => 'Somalia', 'code' => 'so' ],
-			[ 'name' => 'South Africa', 'code' => 'za' ],
-			[ 'name' => 'South Korea', 'code' => 'kr' ],
-			[ 'name' => 'South Sudan', 'code' => 'ss' ],
-			[ 'name' => 'Spain', 'code' => 'es' ],
-			[ 'name' => 'Sri Lanka', 'code' => 'lk' ],
-			[ 'name' => 'Sudan', 'code' => 'sd' ],
-			[ 'name' => 'Suriname', 'code' => 'sr' ],
-			[ 'name' => 'Swaziland', 'code' => 'sz' ],
-			[ 'name' => 'Sweden', 'code' => 'se' ],
-			[ 'name' => 'Switzerland', 'code' => 'ch' ],
-			[ 'name' => 'Syria', 'code' => 'sy' ],
-			[ 'name' => 'Taiwan', 'code' => 'tw' ],
-			[ 'name' => 'Tajikistan', 'code' => 'tj' ],
-			[ 'name' => 'Tanzania', 'code' => 'tz' ],
-			[ 'name' => 'Thailand', 'code' => 'th' ],
-			[ 'name' => 'Togo', 'code' => 'tg' ],
-			[ 'name' => 'Tonga', 'code' => 'to' ],
-			[ 'name' => 'Trinidad and Tobago', 'code' => 'tt' ],
-			[ 'name' => 'Tunisia', 'code' => 'tn' ],
-			[ 'name' => 'Turkey', 'code' => 'tr' ],
-			[ 'name' => 'Turkmenistan', 'code' => 'tm' ],
-			[ 'name' => 'Tuvalu', 'code' => 'tv' ],
-			[ 'name' => 'Uganda', 'code' => 'ug' ],
-			[ 'name' => 'Ukraine', 'code' => 'ua' ],
-			[ 'name' => 'United Arab Emirates', 'code' => 'ae' ],
-			[ 'name' => 'United Kingdom', 'code' => 'gb' ],
-			[ 'name' => 'United States', 'code' => 'us' ],
-			[ 'name' => 'Uruguay', 'code' => 'uy' ],
-			[ 'name' => 'Uzbekistan', 'code' => 'uz' ],
-			[ 'name' => 'Vanuatu', 'code' => 'vu' ],
-			[ 'name' => 'Vatican City', 'code' => 'va' ],
-			[ 'name' => 'Venezuela', 'code' => 've' ],
-			[ 'name' => 'Vietnam', 'code' => 'vn' ],
-			[ 'name' => 'Yemen', 'code' => 'ye' ],
-			[ 'name' => 'Zambia', 'code' => 'zm' ],
-			[ 'name' => 'Zimbabwe', 'code' => 'zw' ],
+			'us' => 'united-states',
+			'gb' => 'united-kingdom',
+			'au' => 'australia',
+			'ca' => 'canada',
+			'fr' => 'france',
+			'de' => 'germany',
+			'br' => 'brazil',
+			'co' => 'colombia',
 		];
 	}
 

@@ -1,10 +1,21 @@
-@props( [ 'traveler_index' => 1, 'is_first' => false, 'initial_expanded' => false ] )
+@props( [
+	'traveler_index' => 1,
+	'is_first' => false,
+	'initial_expanded' => false,
+	'initial_first_name' => '',
+	'initial_last_name' => '',
+	'initial_email' => '',
+	'initial_dob_month' => '',
+	'initial_dob_day' => '',
+	'initial_dob_year' => '',
+	'initial_marketing_optin' => false
+] )
 
 <div
 	class="traveler-accordion"
 	x-data="{
 		isOpen: {{ $initial_expanded ? 'true' : 'false' }},
-		firstName: '',
+		firstName: '{{ old('travelers.'.$traveler_index.'.first_name', $initial_first_name) }}',
 		travelerIndex: {{ $traveler_index }},
 		sequentialNumber: {{ $traveler_index }},
 		get title() {
@@ -75,6 +86,7 @@
 				<input
 					type="text"
 					name="travelers[{{ $traveler_index }}][last_name]"
+					value="{{ old('travelers.'.$traveler_index.'.last_name', $initial_last_name) }}"
 					x-bind:aria-invalid="hasError('travelers.{{ $traveler_index }}.last_name') ? 'true' : null"
 					x-bind:aria-describedby="hasError('travelers.{{ $traveler_index }}.last_name') ? 'travelers-{{ $traveler_index }}-last-name-error' : null"
 					x-on:input="clearFieldError('travelers.{{ $traveler_index }}.last_name')"
@@ -92,7 +104,14 @@
 			<!-- Date of birth -->
 			<div class="traveler-field traveler-field-full">
 				<label>@lang('Date of birth')</label>
-				<x-date-selector :traveler_index="$traveler_index" name="date_of_birth" :required="false" />
+				<x-date-selector
+					:traveler_index="$traveler_index"
+					name="date_of_birth"
+					:required="false"
+					:initial_month="$initial_dob_month"
+					:initial_day="$initial_dob_day"
+					:initial_year="$initial_dob_year"
+				/>
 			</div>
 
 			@if ( $is_first )
@@ -102,6 +121,7 @@
 					<input
 						type="email"
 						name="travelers[{{ $traveler_index }}][email]"
+						value="{{ old('travelers.'.$traveler_index.'.email', $initial_email) }}"
 						x-bind:aria-invalid="hasError('travelers.{{ $traveler_index }}.email') ? 'true' : null"
 						x-bind:aria-describedby="hasError('travelers.{{ $traveler_index }}.email') ? 'travelers-{{ $traveler_index }}-email-error' : null"
 						x-on:input="clearFieldError('travelers.{{ $traveler_index }}.email')"
@@ -126,6 +146,7 @@
 							type="checkbox"
 							name="travelers[{{ $traveler_index }}][marketing_optin]"
 							value="1"
+							{{ old('travelers.'.$traveler_index.'.marketing_optin', $initial_marketing_optin) ? 'checked' : '' }}
 						>
 						<span class="color-muted" style="font-weight: normal;font-size: .85rem">
 							@lang('I want to receive 3i Visa updates, product launches and personalized offers. I can opt out anytime. Terms and Privacy Policy apply.')

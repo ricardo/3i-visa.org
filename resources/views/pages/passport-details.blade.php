@@ -126,6 +126,12 @@
 								:traveler_index="$index"
 								:traveler_name="$traveler['first_name'] ?? ''"
 								:initial_expanded="$loop->first"
+								:initial_nationality="$traveler['nationality'] ?? $nationality ?? null"
+								:initial_passport_number="$traveler['passport_number'] ?? ''"
+								:initial_passport_expiration_month="$traveler['passport_expiration_month'] ?? ''"
+								:initial_passport_expiration_day="$traveler['passport_expiration_day'] ?? ''"
+								:initial_passport_expiration_year="$traveler['passport_expiration_year'] ?? ''"
+								:initial_add_passport_later="isset($traveler['add_passport_later']) && $traveler['add_passport_later'] ? true : false"
 							/>
 						@endforeach
 					</div>

@@ -189,8 +189,22 @@
 					<!-- Traveler Accordions -->
 					<div class="travelers-list">
 						@foreach( range( 1, 10 ) as $index )
+							@php
+								$existing_data = $existing_travelers[$index] ?? [];
+							@endphp
 							<div x-show="isTravelerActive({{ $index }})">
-								<x-traveler-accordion :traveler_index="$index" :is_first="$index === 1" :initial_expanded="$index === 1" />
+								<x-traveler-accordion
+									:traveler_index="$index"
+									:is_first="$index === 1"
+									:initial_expanded="$index === 1"
+									:initial_first_name="$existing_data['first_name'] ?? ''"
+									:initial_last_name="$existing_data['last_name'] ?? ''"
+									:initial_email="$existing_data['email'] ?? ''"
+									:initial_dob_month="$existing_data['date_of_birth_month'] ?? ''"
+									:initial_dob_day="$existing_data['date_of_birth_day'] ?? ''"
+									:initial_dob_year="$existing_data['date_of_birth_year'] ?? ''"
+									:initial_marketing_optin="isset($existing_data['marketing_optin']) && $existing_data['marketing_optin'] ? true : false"
+								/>
 							</div>
 						@endforeach
 					</div>

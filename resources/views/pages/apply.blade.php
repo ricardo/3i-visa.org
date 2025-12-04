@@ -9,7 +9,7 @@
 				</h1>
 
 				<!-- Hero Section -->
-				<div>
+				<div class="apply-hero">
 					<!--
 						TODO: Add visual element here. Suggestions:
 						- Airplane illustration with confetti/celebration elements
@@ -18,10 +18,10 @@
 						- SVG illustration from undraw.co or similar
 						- Lottie animation for dynamic effect
 					-->
-					<!-- <div class="apply-hero-content">
+					<div class="apply-hero-content">
+						<img src="{{ asset( 'images/plane.svg' ) }}">
 						<h2>@lang( 'Good news! You don\'t need a visa!' )</h2>
-					</div> -->
-					<img src="{{ asset( 'images/temp-image.png' ) }}">
+					</div>
 				</div>
 
 				<!-- Application Form -->
@@ -48,7 +48,7 @@
 					<!-- Total Applicants -->
 					<div class="apply-form-field">
 						<label>@lang( 'Total applicants' )</label>
-						<x-stepper name="applicants" :min="1" :max="10" :initial="1" />
+						<x-stepper name="applicants" :min="1" :max="10" :initial="(int) session('visa_application.applicants', 1)" />
 					</div>
 				</form>
 			</div>

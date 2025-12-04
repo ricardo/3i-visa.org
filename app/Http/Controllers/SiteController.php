@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Countries;
 use App\Helpers\Currencies;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
@@ -97,7 +98,7 @@ class SiteController extends Controller {
 		$destination = $request->input( 'destination' );
 
 		// Validate inputs.
-		$valid_countries = [ 'au', 'br', 'ca', 'co', 'fr', 'de', 'gb', 'us' ];
+		$valid_countries = Countries::getPriorityCountries();
 
 		if ( ! in_array( $passport, $valid_countries ) || ! in_array( $destination, $valid_countries ) ) {
 			return redirect()->back()->withErrors( [
@@ -112,25 +113,13 @@ class SiteController extends Controller {
 			] );
 		}
 
-		// Country code to slug mapping.
-		$country_slugs = [
-			'au' => 'australia',
-			'br' => 'brazil',
-			'ca' => 'canada',
-			'co' => 'colombia',
-			'fr' => 'france',
-			'de' => 'germany',
-			'gb' => 'united-kingdom',
-			'us' => 'united-states',
-		];
-
 		// Store nationality (passport) in session.
-		$request->session()->put( 'visa_application', [
-			'nationality' => $passport,
-			'destination' => $destination,
-		] );
+		// Use dot notation to preserve existing data (applicants, travelers, etc.)
+		$request->session()->put( 'visa_application.nationality', $passport );
+		$request->session()->put( 'visa_application.destination', $destination );
 
 		// Get destination slug.
+		$country_slugs = Countries::getCountrySlugs();
 		$destination_slug = $country_slugs[ $destination ] ?? $destination;
 
 		// Redirect to apply page.
@@ -139,28 +128,7 @@ class SiteController extends Controller {
 
 	public function getApplyPage( Request $request, $country ) {
 		// Slug to country code mapping.
-		$slug_to_code = [
-			'australia' => 'au',
-			'brazil' => 'br',
-			'canada' => 'ca',
-			'colombia' => 'co',
-			'france' => 'fr',
-			'germany' => 'de',
-			'united-kingdom' => 'gb',
-			'united-states' => 'us',
-		];
-
-		// Country code to name mapping.
-		$country_names = [
-			'au' => 'Australia',
-			'br' => 'Brazil',
-			'ca' => 'Canada',
-			'co' => 'Colombia',
-			'fr' => 'France',
-			'de' => 'Germany',
-			'gb' => 'United Kingdom',
-			'us' => 'United States',
-		];
+		$slug_to_code = array_flip( Countries::getCountrySlugs() );
 
 		// Get country code from slug.
 		$country_code = $slug_to_code[ $country ] ?? null;
@@ -178,17 +146,8 @@ class SiteController extends Controller {
 			return redirect()->route( 'home' );
 		}
 
-		// Get country list for dropdown.
-		$visa_countries = [
-			[ 'name' => 'Australia', 'code' => 'au' ],
-			[ 'name' => 'Brazil', 'code' => 'br' ],
-			[ 'name' => 'Canada', 'code' => 'ca' ],
-			[ 'name' => 'Colombia', 'code' => 'co' ],
-			[ 'name' => 'France', 'code' => 'fr' ],
-			[ 'name' => 'Germany', 'code' => 'de' ],
-			[ 'name' => 'United Kingdom', 'code' => 'gb' ],
-			[ 'name' => 'United States', 'code' => 'us' ],
-		];
+		// Get country list for dropdown (translated).
+		$visa_countries = Countries::getVisaCountries();
 
 		// Find pre-selected nationality.
 		$selected_nationality = null;
@@ -200,7 +159,7 @@ class SiteController extends Controller {
 		}
 
 		return view( 'pages.apply', [
-			'country_name' => $country_names[ $country_code ],
+			'country_name' => Countries::getCountryName( $country_code ),
 			'country_code' => $country_code,
 			'country_slug' => $country,
 			'visa_countries' => $visa_countries,
@@ -210,8 +169,9 @@ class SiteController extends Controller {
 
 	public function postApplyPage( Request $request, $country ) {
 		// Validate inputs.
+		$valid_country_codes = implode( ',', Countries::getPriorityCountries() );
 		$request->validate( [
-			'nationality' => 'required|string|in:au,br,ca,co,fr,de,gb,us',
+			'nationality' => "required|string|in:{$valid_country_codes}",
 			'applicants' => 'required|integer|min:1|max:10',
 		] );
 
@@ -228,28 +188,7 @@ class SiteController extends Controller {
 
 	public function getApplicationDetails( Request $request, $country ) {
 		// Slug to country code mapping.
-		$slug_to_code = [
-			'australia' => 'au',
-			'brazil' => 'br',
-			'canada' => 'ca',
-			'colombia' => 'co',
-			'france' => 'fr',
-			'germany' => 'de',
-			'united-kingdom' => 'gb',
-			'united-states' => 'us',
-		];
-
-		// Country code to name mapping.
-		$country_names = [
-			'au' => 'Australia',
-			'br' => 'Brazil',
-			'ca' => 'Canada',
-			'co' => 'Colombia',
-			'fr' => 'France',
-			'de' => 'Germany',
-			'gb' => 'United Kingdom',
-			'us' => 'United States',
-		];
+		$slug_to_code = array_flip( Countries::getCountrySlugs() );
 
 		// Get country code from slug.
 		$country_code = $slug_to_code[ $country ] ?? null;
@@ -260,7 +199,12 @@ class SiteController extends Controller {
 
 		// Get visa application data from session.
 		$visa_data = $request->session()->get( 'visa_application', [] );
-		$applicants_count = $visa_data['applicants'] ?? null;
+		$existing_travelers = $visa_data['travelers'] ?? [];
+
+		// Use the explicitly set applicants count if available,
+		// otherwise fall back to counting existing travelers
+		$applicants_count = $visa_data['applicants']
+			?? ( ! empty( $existing_travelers ) ? count( $existing_travelers ) : null );
 
 		// If no applicants count in session, redirect to apply page.
 		if ( ! $applicants_count ) {
@@ -268,7 +212,8 @@ class SiteController extends Controller {
 		}
 
 		// Store country name in session for use in form.
-		$request->session()->put( 'visa_application.destination_name', $country_names[ $country_code ] );
+		$country_name = Countries::getCountryName( $country_code );
+		$request->session()->put( 'visa_application.destination_name', $country_name );
 
 		// Pricing and currency conversion.
 		$base_price_usd = 49; // Base price per traveler in USD.
@@ -278,10 +223,11 @@ class SiteController extends Controller {
 		$currency_symbol = Currencies::getSymbol( $user_currency );
 
 		return view( 'pages.application-details', [
-			'country_name' => $country_names[ $country_code ],
+			'country_name' => $country_name,
 			'country_code' => $country_code,
 			'country_slug' => $country,
 			'applicants_count' => $applicants_count,
+			'existing_travelers' => $existing_travelers,
 			'price_per_traveler' => $price_per_traveler,
 			'total_price' => $total_price,
 			'currency_symbol' => $currency_symbol,
@@ -333,6 +279,9 @@ class SiteController extends Controller {
 		// Store traveler data in session.
 		$request->session()->put( 'visa_application.travelers', $request->input( 'travelers' ) );
 
+		// Update applicants count to match actual number of travelers
+		$request->session()->put( 'visa_application.applicants', count( $request->input( 'travelers' ) ) );
+
 		// Handle Ajax requests.
 		if ( $request->ajax() || $request->wantsJson() ) {
 			return response()->json( [
@@ -348,28 +297,7 @@ class SiteController extends Controller {
 
 	public function getPassportDetails( Request $request, $country ) {
 		// Slug to country code mapping.
-		$slug_to_code = [
-			'australia' => 'au',
-			'brazil' => 'br',
-			'canada' => 'ca',
-			'colombia' => 'co',
-			'france' => 'fr',
-			'germany' => 'de',
-			'united-kingdom' => 'gb',
-			'united-states' => 'us',
-		];
-
-		// Country code to name mapping.
-		$country_names = [
-			'au' => 'Australia',
-			'br' => 'Brazil',
-			'ca' => 'Canada',
-			'co' => 'Colombia',
-			'fr' => 'France',
-			'de' => 'Germany',
-			'gb' => 'United Kingdom',
-			'us' => 'United States',
-		];
+		$slug_to_code = array_flip( Countries::getCountrySlugs() );
 
 		// Get country code from slug.
 		$country_code = $slug_to_code[ $country ] ?? null;
@@ -388,6 +316,7 @@ class SiteController extends Controller {
 		}
 
 		$applicants_count = count( $travelers );
+		$nationality = $visa_data['nationality'] ?? null;
 
 		// Pricing and currency conversion.
 		$base_price_usd = 49; // Base price per traveler in USD.
@@ -396,11 +325,12 @@ class SiteController extends Controller {
 		$currency_symbol = Currencies::getSymbol( $user_currency );
 
 		return view( 'pages.passport-details', [
-			'country_name' => $country_names[ $country_code ],
+			'country_name' => Countries::getCountryName( $country_code ),
 			'country_code' => $country_code,
 			'country_slug' => $country,
 			'travelers' => $travelers,
 			'applicants_count' => $applicants_count,
+			'nationality' => $nationality,
 			'price_per_traveler' => $price_per_traveler,
 			'currency_symbol' => $currency_symbol,
 		] );
@@ -435,7 +365,7 @@ class SiteController extends Controller {
 				$rules["travelers.{$index}.passport_number"] = 'required|string|max:255';
 				$rules["travelers.{$index}.passport_expiration_month"] = 'required|integer|min:1|max:12';
 				$rules["travelers.{$index}.passport_expiration_day"] = 'required|integer|min:1|max:31';
-				$rules["travelers.{$index}.passport_expiration_year"] = 'required|integer|min:' . date( 'Y' ) . '|max:' . ( date( 'Y' ) + 20 );
+				$rules["travelers.{$index}.passport_expiration_year"] = 'required|integer|min:2025|max:' . now()->addYears( 20 )->format( 'Y' );
 
 				$attributes["travelers.{$index}.passport_number"] = 'passport number';
 				$attributes["travelers.{$index}.passport_expiration_month"] = 'passport expiration month';

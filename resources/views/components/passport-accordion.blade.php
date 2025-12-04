@@ -1,4 +1,28 @@
-@props( [ 'traveler_index' => 1, 'traveler_name' => '', 'initial_expanded' => false ] )
+@props( [
+	'traveler_index' => 1,
+	'traveler_name' => '',
+	'initial_expanded' => false,
+	'initial_nationality' => null,
+	'initial_passport_number' => '',
+	'initial_passport_expiration_month' => '',
+	'initial_passport_expiration_day' => '',
+	'initial_passport_expiration_year' => '',
+	'initial_add_passport_later' => false
+] )
+
+@php
+	// Convert initial_nationality code to full country object for searchable-input
+	$initial_country_value = null;
+	if ( $initial_nationality ) {
+		$all_countries = \App\Helpers\Countries::getCountries();
+		foreach ( $all_countries as $country ) {
+			if ( $country['code'] === $initial_nationality ) {
+				$initial_country_value = $country;
+				break;
+			}
+		}
+	}
+@endphp
 
 <div
 	class="traveler-accordion"
@@ -7,7 +31,7 @@
 		travelerIndex: {{ $traveler_index }},
 		sequentialNumber: {{ $traveler_index }},
 		travelerName: '{{ $traveler_name }}',
-		addPassportLater: false,
+		addPassportLater: {{ $initial_add_passport_later ? 'true' : 'false' }},
 		get title() {
 			return this.travelerName.trim()
 				? '@lang('Traveler') #' + this.sequentialNumber + ' - ' + this.travelerName
@@ -51,12 +75,18 @@
 			<!-- Nationality on passport -->
 			<div class="traveler-field traveler-field-full">
 				<label>@lang('Nationality on passport')</label>
-				<livewire:searchable-input
-					:name="'travelers[' . $traveler_index . '][nationality]'"
-					:items="\App\Helpers\Countries::getCountries()"
-					:placeholder="__('Select your nationality')"
-					:required="true"
-				/>
+				<div x-data="{ get isInvalid() { return hasError('travelers.{{ $traveler_index }}.nationality'); } }">
+					<div x-bind:aria-invalid="isInvalid ? 'true' : null">
+						<livewire:searchable-input
+							:name="'travelers[' . $traveler_index . '][nationality]'"
+							:items="\App\Helpers\Countries::getCountries()"
+							:placeholder="__('Select your nationality')"
+							:required="true"
+							:show_flags="true"
+							:initial_value="$initial_country_value"
+						/>
+					</div>
+				</div>
 				<small
 					id="travelers-{{ $traveler_index }}-nationality-error"
 					class="error-message"
@@ -93,6 +123,7 @@
 				<input
 					type="text"
 					name="travelers[{{ $traveler_index }}][passport_number]"
+					value="{{ old('travelers.'.$traveler_index.'.passport_number', $initial_passport_number) }}"
 					x-bind:aria-invalid="hasError('travelers.{{ $traveler_index }}.passport_number') ? 'true' : null"
 					x-bind:aria-describedby="hasError('travelers.{{ $traveler_index }}.passport_number') ? 'travelers-{{ $traveler_index }}-passport-number-error' : null"
 					x-on:input="clearFieldError('travelers.{{ $traveler_index }}.passport_number')"
@@ -110,7 +141,15 @@
 			<!-- Passport expiration date (conditional) -->
 			<div class="traveler-field traveler-field-full" x-show="!addPassportLater">
 				<label>@lang('Passport expiration date')</label>
-				<x-date-selector :traveler_index="$traveler_index" name="passport_expiration" :required="false" />
+				<x-date-selector
+					:traveler_index="$traveler_index"
+					name="passport_expiration"
+					:required="false"
+					type="expiration"
+					:initial_month="$initial_passport_expiration_month"
+					:initial_day="$initial_passport_expiration_day"
+					:initial_year="$initial_passport_expiration_year"
+				/>
 			</div>
 		</div>
 	</div>

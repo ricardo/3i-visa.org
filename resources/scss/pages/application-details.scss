@@ -97,7 +97,7 @@
 
 	@include respond-to( md, 'max' ) {
 		grid-template-columns: 1fr;
-		padding: calc( var( --3i-spacing ) * 1.5 );
+		padding: calc( var( --3i-spacing ) * 1.5 ) calc( var( --3i-spacing ) * 1 );
 		gap: calc( var( --3i-spacing ) * 1.2 );
 	}
 }
@@ -127,7 +127,7 @@
 
 .traveler-field-info {
 	color: var( --3i-muted-color );
-	margin-top: 0.25rem;
+	margin-top: -0.25rem;
 	line-height: 1.4;
 }
 
@@ -184,7 +184,6 @@
 	span {
 		font-size: 0.85rem;
 		line-height: 1.4;
-		color: var( --3i-muted-color );
 		font-weight: 400;
 	}
 }
@@ -248,7 +247,7 @@
 			svg {
 				width: 100%;
 				height: 100%;
-				color: #DC2626;
+				color: var( --3i-form-element-invalid-border-color );
 			}
 		}
 
@@ -260,21 +259,8 @@
 }
 // Validation errors
 [aria-invalid="true"] {
-	--3i-border-color: #DC2626 !important;
-	border-color: #DC2626 !important;
-}
-
-.error-message {
-	display: block;
-	font-size: 0.875rem;
-	line-height: 1.4;
-}
-
-// // Date field error messages
-.date-field {
-	.error-message {
-		margin-top: 0;
-	}
+	--3i-border-color: var( --3i-form-element-invalid-border-color ) !important;
+	border-color: var( --3i-form-element-invalid-border-color ) !important;
 }
 
 // Mobile Progress Bar
@@ -300,7 +286,7 @@
 	line-height: 1.2em;
 	font-weight: bold;
 	margin-top: calc( var( --3i-spacing ) * 2 );
-	margin-bottom: calc( var( --3i-spacing ) * 1.5 );
+	margin-bottom: calc( var( --3i-spacing ) * 1.2 );
 
 	@include respond-to( lg, 'max' ) {
 		margin-top: calc( var( --3i-spacing ) * 1.5 );
@@ -364,7 +350,7 @@
 
 	.progress-step-label {
 		font-size: 0.95rem;
-		font-weight: 500;
+		font-weight: 600;
 		color: var( --3i-muted-color );
 		transition: color 0.3s ease;
 		white-space: nowrap;

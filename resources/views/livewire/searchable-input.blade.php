@@ -84,7 +84,17 @@
 				x-on:keydown="handleKeydown"
 				x-on:click="handleInputClick()"
 				autocomplete="off"
+				@if( $invalid ) aria-invalid="true" @endif
 			/>
+
+			<!-- Hidden input for form submission -->
+			@if( $name )
+				<input
+					type="hidden"
+					name="{{ $name }}"
+					value="{{ is_array( $selected_value ) && isset( $selected_value['code'] ) ? $selected_value['code'] : $selected_value }}"
+				/>
+			@endif
 
 			<!-- Chevron Icon -->
 			<svg

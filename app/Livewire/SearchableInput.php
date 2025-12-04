@@ -12,6 +12,8 @@ class SearchableInput extends Component {
 	public $wire_model = '';
 	public $initial_value = null;
 	public $required = false;
+	public $name = '';
+	public $invalid = false;
 
 	public $search = '';
 	public $selected_value = '';
@@ -30,14 +32,18 @@ class SearchableInput extends Component {
 	 * @param string $wire_model Name for wire:model binding
 	 * @param array|string|null $initial_value Initial selected value
 	 * @param bool $required Whether the field is required (restores value on blur if empty)
+	 * @param string $name Name attribute for hidden input field
+	 * @param bool $invalid Whether the field has validation errors
 	 */
-	public function mount( $items = [], $placeholder = 'Search...', $show_flags = false, $wire_model = '', $initial_value = null, $required = false ) {
+	public function mount( $items = [], $placeholder = 'Search...', $show_flags = false, $wire_model = '', $initial_value = null, $required = false, $name = '', $invalid = false ) {
 		$this->items = $items;
 		$this->placeholder = $placeholder;
 		$this->show_flags = $show_flags;
 		$this->wire_model = $wire_model;
 		$this->initial_value = $initial_value;
 		$this->required = $required;
+		$this->name = $name;
+		$this->invalid = $invalid;
 
 		// Set initial value if provided
 		if ( $this->initial_value ) {

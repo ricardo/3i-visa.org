@@ -1,9 +1,15 @@
+@use "../mixins" as *;
+
 input:not([type=checkbox], [type=radio]), select, textarea, details.dropdown summary {
 	border-radius: .7rem;
 	border: 1px solid var( --3i-border-color );
 	font-size: .95rem !important;
 	background-color: white;
 	box-shadow: 0 1px 2px 0 rgb( 0 0 0 / 0.05 );
+
+	@include respond-to( 'lg' ) {
+		--3i-form-element-spacing-horizontal: 1rem;
+	}
 
 	&:focus {
 		outline: 1px solid !important;
@@ -12,9 +18,18 @@ input:not([type=checkbox], [type=radio]), select, textarea, details.dropdown sum
 	// Change placeholder color.
 	&::placeholder {
 		color: rgba( 0, 0, 0, .3 ) !important;
+
 	}
 }
 
 input[type=checkbox] {
 	border-radius: .3rem;
+}
+
+// Error message styling
+.error-message {
+	display: block;
+	color: var( --3i-form-element-invalid-border-color ) !important;
+	font-size: 0.875rem;
+	line-height: 1.4;
 }
