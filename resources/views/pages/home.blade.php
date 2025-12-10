@@ -134,6 +134,85 @@
 			<img class="line" src="{{ asset( 'images/line.webp' ) }}">
 		</div>
 
+		<section class="why-3i-visa container">
+			<h2>@lang( 'Why millions of travelers use 3i-Visa' )</h2>
+
+			<div class="grid">
+				{{-- LEFT COLUMN --}}
+				<div class="do-yourself">
+					<h3>@lang( 'Do it yourself' )</h3>
+
+					<ul>
+						<li>
+							@include( 'icons.circle-minus' )
+							@lang( 'Confusing government websites, confusing forms, and confusing instructions' )
+						</li>
+						<li>
+							@include( 'icons.circle-minus' )
+							@lang( 'One mistake? Get rejected or delayed' )
+						</li>
+						<li>
+							@include( 'icons.circle-minus' )
+							@lang( 'Limited times when government will accept' )
+						</li>
+						<li>
+							@include( 'icons.circle-minus' )
+							@lang( 'Usually no assistance or support available' )
+						</li>
+						<li>
+							@include( 'icons.circle-minus' )
+							@lang( 'Start all over if you lose progress' )
+						</li>
+						<li>
+							@include( 'icons.circle-minus' )
+							@lang( 'Limited payment methods' )
+						</li>
+					</ul>
+				</div>
+
+				{{-- RIGHT COLUMN --}}
+				<div class="with-3i-visa">
+					<h3>
+						@lang( 'With' )
+						<img class="logo" src="{{ asset('images/logo.svg') }}" alt="3i-Visa">
+					</h3>
+
+					<ul>
+						<li>
+							@include( 'icons.circle-check-big' )
+							@lang( 'Intuitive application, done in minutes' )
+						</li>
+						<li>
+							@include( 'icons.circle-check-big' )
+							@lang( 'Detailed application review ensures approval on the first try' )
+						</li>
+						<li>
+							@include( 'icons.circle-check-big' )
+							@lang( 'Apply anytime, 24/7' )
+						</li>
+						<li>
+							@include( 'icons.circle-check-big' )
+							@lang( 'Chat, WhatsApp, and email round-the-clock support' )
+						</li>
+						<li>
+							@include( 'icons.circle-check-big' )
+							@lang( 'Save and continue later' )
+						</li>
+						<li>
+							@include( 'icons.circle-check-big' )
+							@lang( 'Multiple payment options' )
+						</li>
+					</ul>
+
+					<button class="button-primary" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
+						@lang( 'Get Started' )
+					</button>
+				</div>
+			</div>
+		</section>
+
+
+
 		<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 		<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 		<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>

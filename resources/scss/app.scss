@@ -288,3 +288,126 @@ main.landing {
 }
 
 
+/* ================================
+   Why 3i-visa Section
+================================= */
+.why-3i-visa {
+	padding: 4rem 1.5rem;
+	max-width: 1100px;
+	margin: 0 auto;
+
+	h2 {
+		text-align: center;
+		font-size: 2rem;
+		font-weight: 700;
+		margin-bottom: 3rem;
+		color: var(--3i-h1-color);
+	}
+
+	.grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0;
+		align-items: flex-start;
+
+		@include respond-to('md') {
+			grid-template-columns: 1fr;
+			row-gap: 2rem;
+		}
+	}
+
+	.do-yourself {
+		background: #f7f9fa;
+		border-radius: 16px 0 0 16px;
+		padding: 2.5rem;
+		border: 1px solid var( --3i-border-color );
+		margin-right: -16px;
+
+		@include respond-to( 'md' ) {
+			border-radius: 16px;
+			margin-right: 0;
+			padding: 2.5rem 1.2rem;
+		}
+
+		h3 {
+			text-align: center;
+			font-size: 1.4rem;
+			font-weight: 700;
+			margin-bottom: 1.5rem;
+		}
+
+		ul {
+			list-style: none;
+			padding: 0;
+			margin: 0;
+
+			li {
+				display: flex;
+				align-items: flex-start;
+				gap: .8rem;
+				margin-bottom: 1.2rem;
+				font-size: 1rem;
+				color: #3d3d3d;
+
+				svg {
+					width: 25px;
+					height: 25px;
+					flex-shrink: 0;
+					color: #7A949B;
+				}
+			}
+		}
+	}
+
+	.with-3i-visa {
+		border: 6px solid #00c47a;
+		border-radius: 20px;
+		background: white;
+		padding: 2.5rem;
+		position: relative;
+
+		@include respond-to( 'md' ) {
+			padding: 2.5rem 1.2rem;
+		}
+
+		h3 {
+			text-align: center;
+			font-size: 1.4rem;
+			font-weight: 700;
+			margin-bottom: 1.5rem;
+
+			img.logo {
+				height: 32px;
+				vertical-align: middle;
+			}
+		}
+
+		ul {
+			list-style: none;
+			padding: 0;
+			margin: 0 0 2rem 0;
+
+			li {
+				display: flex;
+				align-items: flex-start;
+				gap: .8rem;
+				margin-bottom: 1.2rem;
+				font-weight: 600;
+				font-size: 1rem;
+				color: #1a1a1a;
+
+				svg {
+					width: 25px;
+					height: 25px;
+					flex-shrink: 0;
+					color: #00C47B;
+				}
+			}
+		}
+
+		button {
+			display: block;
+			margin: 0 auto;
+		}
+	}
+}
