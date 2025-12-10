@@ -273,22 +273,22 @@
 					@lang('Previous')
 				</a>
 			</aside>
-		</div>
 
-		<!-- Mobile/Tablet Fixed Bottom Button -->
-		<div class="apply-mobile-submit display-mobile-only">
-			<div class="mobile-total-section">
-				<div class="mobile-total-label">@lang('Total')</div>
-				<div class="mobile-total-calculated">@lang('Calculated at checkout')</div>
+			<!-- Mobile/Tablet Fixed Bottom Button -->
+			<div class="apply-mobile-submit display-mobile-only">
+				<div class="mobile-total-section">
+					<div class="mobile-total-label">@lang('Total')</div>
+					<div class="mobile-total-calculated">@lang('Calculated at checkout')</div>
+				</div>
+				<button
+					type="submit"
+					form="application-details-form"
+					class="apply-mobile-submit-button"
+					x-bind:aria-busy="isSubmitting"
+				>
+					@lang( 'Save and continue' )
+				</button>
 			</div>
-			<button
-				type="submit"
-				form="application-details-form"
-				class="apply-mobile-submit-button"
-				x-bind:aria-busy="isSubmitting"
-			>
-				@lang( 'Save and continue' )
-			</button>
 		</div>
 	</main>
 @endsection

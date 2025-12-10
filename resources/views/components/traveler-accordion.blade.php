@@ -18,10 +18,40 @@
 		firstName: '{{ old('travelers.'.$traveler_index.'.first_name', $initial_first_name) }}',
 		travelerIndex: {{ $traveler_index }},
 		sequentialNumber: {{ $traveler_index }},
+		storageKey: 'application_details_accordions',
 		get title() {
 			return this.firstName.trim()
 				? '@lang('Traveler') #' + this.sequentialNumber + ' - ' + this.firstName
 				: '@lang('Traveler') #' + this.sequentialNumber;
+		},
+		init() {
+			// Restore accordion state from sessionStorage
+			const savedState = sessionStorage.getItem(this.storageKey);
+			if (savedState) {
+				try {
+					const state = JSON.parse(savedState);
+					if (state.hasOwnProperty(this.travelerIndex)) {
+						this.isOpen = state[this.travelerIndex];
+					}
+				} catch (e) {
+					// Invalid JSON, ignore
+				}
+			}
+		},
+		saveState() {
+			// Save accordion state to sessionStorage
+			try {
+				const savedState = sessionStorage.getItem(this.storageKey);
+				const state = savedState ? JSON.parse(savedState) : {};
+				state[this.travelerIndex] = this.isOpen;
+				sessionStorage.setItem(this.storageKey, JSON.stringify(state));
+			} catch (e) {
+				// sessionStorage not available, ignore
+			}
+		},
+		toggleAccordion() {
+			this.isOpen = !this.isOpen;
+			this.saveState();
 		},
 		// Helper functions to access parent form data
 		getFormData() {
@@ -43,14 +73,14 @@
 			}
 		}
 	}"
-	x-on:expand-traveler.window="if ($event.detail === {{ $traveler_index }}) { isOpen = true; }"
+	x-on:expand-traveler.window="if ($event.detail === {{ $traveler_index }}) { isOpen = true; saveState(); }"
 	x-on:update-sequential-number.window="
 		if ($event.detail.travelerIndex === travelerIndex) {
 			sequentialNumber = $event.detail.sequentialNumber;
 		}
 	"
 >
-	<div class="traveler-accordion-header" x-on:click="isOpen = !isOpen">
+	<div class="traveler-accordion-header" x-on:click="toggleAccordion()">
 		<h3 class="traveler-accordion-title" x-text="title"></h3>
 		<div class="traveler-accordion-icon" x-bind:class="{ 'rotated': isOpen }">
 			@include('icons.chevron-down')

@@ -35,11 +35,10 @@
 							'items' => $visa_countries,
 							'placeholder' => __( 'Select your nationality' ),
 							'show_flags' => true,
-							'wire_model' => 'nationality',
+							'name' => 'nationality',
 							'initial_value' => $selected_nationality,
 							'required' => true,
 						] )
-						<input type="hidden" name="nationality" value="{{ $selected_nationality['code'] ?? '' }}" required>
 						<small class="apply-helper-text">
 							@lang( 'Ensure you select the nationality of the passport you\'ll be traveling with.' )
 						</small>

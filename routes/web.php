@@ -54,6 +54,10 @@ Route::group( [
 	Route::post( '{country}/processing-time', [ SiteController::class, 'postProcessingTime' ] )->name( 'processing.time.submit' );
 	Route::post( '{country}/processing-time/update', [ SiteController::class, 'updateProcessingTime' ] )->name( 'processing.time.update' );
 
+	// Review page.
+	Route::get( '{country}/review', [ SiteController::class, 'getReview' ] )->name( 'review' );
+	Route::post( '{country}/review', [ SiteController::class, 'postReview' ] )->name( 'review.submit' );
+
 	// Auth:Login.
 	Route::post( 'login', [ AuthController::class, 'postLogin' ] )->name( 'login.post' );
 	Route::get( 'login/google', [ AuthController::class, 'getLoginWithGoogle' ] )->name( 'login.google' );

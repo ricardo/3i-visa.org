@@ -22,11 +22,11 @@
 	$current_locale = app()->getLocale();
 	$pre_selected_passport = $locale_country_map[ $current_locale ] ?? $locale_country_map['en'];
 @endphp
-@extends( 'layouts/main' )
+@extends( 'layouts/main', [ 'class' => 'home' ] )
 @section( 'title', __( 'Home' ) . ' • 3i Visa' )
 @section( 'content' )
-	<main class="container landing">
-		<section class="hero medium">
+	<main class="landing">
+		<section class="hero medium container">
 			<h1 id="main-heading" class="color-highlight">
 				@lang( 'The' ) <mark>@lang( 'easiest' )</mark> @lang( 'way to get your travel visa' )
 			</h1>
@@ -116,7 +116,7 @@
 					</div>
 
 					<div class="hero-form-field">
-						<label>&nbsp;</label>
+						<label class="hide-mobile">&nbsp;</label>
 						<button
 							type="submit"
 							class="hero-submit-button mb-0"
@@ -128,6 +128,14 @@
 				</div>
 			</form>
 		</section>
-		<br>
+
+		<div class="home-image">
+			<img class="traveler" src="{{ asset( 'images/traveler-on-suitcase-sm.webp' ) }}">
+			<img class="line" src="{{ asset( 'images/line.webp' ) }}">
+		</div>
+
+		<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+		<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+		<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 	</main>
 @endsection

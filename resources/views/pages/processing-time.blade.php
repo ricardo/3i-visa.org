@@ -203,24 +203,24 @@
 					@lang('Previous')
 				</a>
 			</aside>
-		</div>
 
-		<!-- Mobile/Tablet Fixed Bottom Button -->
-		<div class="apply-mobile-submit display-mobile-only">
-			<div class="mobile-total-section">
-				<div class="mobile-total-label">@lang('Total')</div>
-				<div class="mobile-total-price">
-					<span x-text="currencySymbol"></span><span x-text="totalPrice"></span>
+			<!-- Mobile/Tablet Fixed Bottom Button -->
+			<div class="apply-mobile-submit display-mobile-only">
+				<div class="mobile-total-section">
+					<div class="mobile-total-label">@lang('Total')</div>
+					<div class="mobile-total-price">
+						<span x-text="currencySymbol"></span><span x-text="totalPrice"></span>
+					</div>
 				</div>
+				<button
+					type="submit"
+					form="processing-time-form"
+					class="apply-mobile-submit-button"
+					x-bind:aria-busy="isSubmitting"
+				>
+					@lang( 'Save and continue' )
+				</button>
 			</div>
-			<button
-				type="submit"
-				form="processing-time-form"
-				class="apply-mobile-submit-button"
-				x-bind:aria-busy="isSubmitting"
-			>
-				@lang( 'Save and continue' )
-			</button>
 		</div>
 	</main>
 @endsection

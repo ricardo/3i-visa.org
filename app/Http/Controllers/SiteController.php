@@ -276,11 +276,34 @@ class SiteController extends Controller {
 		// Validate inputs.
 		$request->validate( $rules, [], $attributes );
 
-		// Store traveler data in session.
-		$request->session()->put( 'visa_application.travelers', $request->input( 'travelers' ) );
+		// Get existing visa application data from session.
+		$visa_data = $request->session()->get( 'visa_application', [] );
+		$existing_travelers = $visa_data['travelers'] ?? [];
+
+		// Build new travelers array with only submitted travelers,
+		// merging with existing data where available (to preserve passport info).
+		$new_travelers = [];
+		foreach ( $submitted_travelers as $index => $application_data ) {
+			if ( isset( $existing_travelers[ $index ] ) ) {
+				// Merge new application data with existing traveler data (preserves passport info)
+				$new_travelers[ $index ] = array_merge(
+					$existing_travelers[ $index ],
+					$application_data
+				);
+			} else {
+				// New traveler, just add it
+				$new_travelers[ $index ] = $application_data;
+			}
+		}
+
+		// Replace travelers array with the new one (removes deleted travelers)
+		$visa_data['travelers'] = $new_travelers;
 
 		// Update applicants count to match actual number of travelers
-		$request->session()->put( 'visa_application.applicants', count( $request->input( 'travelers' ) ) );
+		$visa_data['applicants'] = count( $new_travelers );
+
+		// Save updated data back to session.
+		$request->session()->put( 'visa_application', $visa_data );
 
 		// Handle Ajax requests.
 		if ( $request->ajax() || $request->wantsJson() ) {
@@ -384,6 +407,18 @@ class SiteController extends Controller {
 		if ( isset( $visa_data['travelers'] ) ) {
 			foreach ( $submitted_travelers as $index => $passport_data ) {
 				if ( isset( $visa_data['travelers'][ $index ] ) ) {
+					// Explicitly handle the add_passport_later checkbox
+					// If checkbox is not present in form data, it means it's unchecked
+					$passport_data['add_passport_later'] = isset( $passport_data['add_passport_later'] ) && $passport_data['add_passport_later'] == '1';
+
+					// If passport is being added later, clear any existing passport data
+					if ( $passport_data['add_passport_later'] ) {
+						$passport_data['passport_number'] = null;
+						$passport_data['passport_expiration_month'] = null;
+						$passport_data['passport_expiration_day'] = null;
+						$passport_data['passport_expiration_year'] = null;
+					}
+
 					$visa_data['travelers'][ $index ] = array_merge(
 						$visa_data['travelers'][ $index ],
 						$passport_data
@@ -505,12 +540,103 @@ class SiteController extends Controller {
 			return response()->json( [
 				'success' => true,
 				'message' => __( 'Processing time saved!' ),
-				'redirect' => route( 'processing.time', [ 'country' => $country ] ) // TODO: Update to next step route
+				'redirect' => route( 'review', [ 'country' => $country ] )
 			] );
 		}
 
-		// TODO: Redirect to next step (payment or confirmation).
+		// Redirect to review page.
+		return redirect()->route( 'review', [ 'country' => $country ] );
+	}
+
+	public function getReview( Request $request, $country ) {
+		// Slug to country code mapping.
+		$slug_to_code = array_flip( Countries::getCountrySlugs() );
+
+		// Get country code from slug.
+		$country_code = $slug_to_code[ $country ] ?? null;
+
+		if ( ! $country_code ) {
+			abort( 404 );
+		}
+
+		// Get visa application data from session.
+		$visa_data = $request->session()->get( 'visa_application', [] );
+		$travelers = $visa_data['travelers'] ?? null;
+		$processing_option = $visa_data['processing_option'] ?? null;
+
+		// If no travelers or processing option in session, redirect to previous step.
+		if ( ! $travelers || ! $processing_option ) {
+			return redirect()->route( 'processing.time', [ 'country' => $country ] );
+		}
+
+		$applicants_count = count( $travelers );
+
+		// Get pricing configuration.
+		$pricing_config = config( 'pricing.colombia' );
+		$base_price_usd = $pricing_config['base_form_price_usd'];
+		$processing_options = $pricing_config['processing_options'];
+		$visa_details = $pricing_config['visa_details'];
+		$denial_protection = $pricing_config['denial_protection'];
+
+		// Get selected processing option details.
+		$selected_option = $processing_options[ $processing_option ];
+
+		// Get denial protection status from session (default to false).
+		$has_denial_protection = $visa_data['denial_protection'] ?? false;
+
+		// Currency conversion.
+		$user_currency = $request->cookie( 'preferred_currency', 'USD' );
+		$price_per_traveler = Currencies::convertFromUSD( $base_price_usd, $user_currency );
+		$currency_symbol = Currencies::getSymbol( $user_currency );
+		$processing_fee = Currencies::convertFromUSD( $selected_option['price_usd'], $user_currency );
+		$denial_protection_price = Currencies::convertFromUSD( $denial_protection['price_usd'], $user_currency );
+
+		// Calculate arrival date (today + processing days).
+		$processing_days = $selected_option['days'];
+		$arrival_date = now()->addDays( $processing_days );
+
+		return view( 'pages.review', [
+			'country_name' => Countries::getCountryName( $country_code ),
+			'country_code' => $country_code,
+			'country_slug' => $country,
+			'applicants_count' => $applicants_count,
+			'travelers' => $travelers,
+			'price_per_traveler' => $price_per_traveler,
+			'currency_symbol' => $currency_symbol,
+			'processing_fee' => $processing_fee,
+			'processing_option' => $processing_option,
+			'processing_name' => $selected_option['name'],
+			'processing_days' => $processing_days,
+			'arrival_date' => $arrival_date,
+			'visa_details' => $visa_details,
+			'denial_protection' => $denial_protection,
+			'denial_protection_price' => $denial_protection_price,
+			'has_denial_protection' => $has_denial_protection,
+		] );
+	}
+
+	public function postReview( Request $request, $country ) {
+		// Validate denial protection choice.
+		$request->validate( [
+			'denial_protection' => 'nullable|boolean',
+		] );
+
+		$has_denial_protection = $request->input( 'denial_protection', false );
+
+		// Update session.
+		$request->session()->put( 'visa_application.denial_protection', $has_denial_protection );
+
+		// Handle Ajax requests.
+		if ( $request->ajax() || $request->wantsJson() ) {
+			return response()->json( [
+				'success' => true,
+				'message' => __( 'Order reviewed!' ),
+				'redirect' => route( 'review', [ 'country' => $country ] ) // TODO: Update to payment route
+			] );
+		}
+
+		// TODO: Redirect to payment page.
 		// For now, redirect back with success message.
-		return redirect()->back()->with( 'success', __( 'Processing time saved!' ) );
+		return redirect()->back()->with( 'success', __( 'Order reviewed!' ) );
 	}
 }
