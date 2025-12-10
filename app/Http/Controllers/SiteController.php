@@ -221,6 +221,7 @@ class SiteController extends Controller {
 		$price_per_traveler = Currencies::convertFromUSD( $base_price_usd, $user_currency );
 		$total_price = $price_per_traveler * $applicants_count;
 		$currency_symbol = Currencies::getSymbol( $user_currency );
+		$currency_config = Currencies::getCurrencyConfig( $user_currency );
 
 		return view( 'pages.application-details', [
 			'country_name' => $country_name,
@@ -231,6 +232,7 @@ class SiteController extends Controller {
 			'price_per_traveler' => $price_per_traveler,
 			'total_price' => $total_price,
 			'currency_symbol' => $currency_symbol,
+			'currency_config' => $currency_config,
 		] );
 	}
 
@@ -283,6 +285,7 @@ class SiteController extends Controller {
 		// Build new travelers array with only submitted travelers,
 		// merging with existing data where available (to preserve passport info).
 		$new_travelers = [];
+		$is_first_index = true;
 		foreach ( $submitted_travelers as $index => $application_data ) {
 			if ( isset( $existing_travelers[ $index ] ) ) {
 				// Merge new application data with existing traveler data (preserves passport info)
@@ -293,6 +296,13 @@ class SiteController extends Controller {
 			} else {
 				// New traveler, just add it
 				$new_travelers[ $index ] = $application_data;
+			}
+
+			// Explicitly handle marketing_optin checkbox for first traveler
+			// (unchecked checkboxes don't submit, so we need to set to false explicitly)
+			if ( $is_first_index ) {
+				$new_travelers[ $index ]['marketing_optin'] = isset( $application_data['marketing_optin'] ) && $application_data['marketing_optin'] == '1';
+				$is_first_index = false;
 			}
 		}
 
@@ -346,6 +356,7 @@ class SiteController extends Controller {
 		$user_currency = $request->cookie( 'preferred_currency', 'USD' );
 		$price_per_traveler = Currencies::convertFromUSD( $base_price_usd, $user_currency );
 		$currency_symbol = Currencies::getSymbol( $user_currency );
+		$currency_config = Currencies::getCurrencyConfig( $user_currency );
 
 		return view( 'pages.passport-details', [
 			'country_name' => Countries::getCountryName( $country_code ),
@@ -356,6 +367,7 @@ class SiteController extends Controller {
 			'nationality' => $nationality,
 			'price_per_traveler' => $price_per_traveler,
 			'currency_symbol' => $currency_symbol,
+			'currency_config' => $currency_config,
 		] );
 	}
 
@@ -477,6 +489,7 @@ class SiteController extends Controller {
 		$user_currency = $request->cookie( 'preferred_currency', 'USD' );
 		$price_per_traveler = Currencies::convertFromUSD( $base_price_usd, $user_currency );
 		$currency_symbol = Currencies::getSymbol( $user_currency );
+		$currency_config = Currencies::getCurrencyConfig( $user_currency );
 
 		// Convert processing fees to user currency.
 		foreach ( $processing_options as $key => $option ) {
@@ -493,6 +506,7 @@ class SiteController extends Controller {
 			'applicants_count' => $applicants_count,
 			'price_per_traveler' => $price_per_traveler,
 			'currency_symbol' => $currency_symbol,
+			'currency_config' => $currency_config,
 			'processing_options' => $processing_options,
 			'selected_processing' => $selected_processing,
 		] );
@@ -588,6 +602,7 @@ class SiteController extends Controller {
 		$user_currency = $request->cookie( 'preferred_currency', 'USD' );
 		$price_per_traveler = Currencies::convertFromUSD( $base_price_usd, $user_currency );
 		$currency_symbol = Currencies::getSymbol( $user_currency );
+		$currency_config = Currencies::getCurrencyConfig( $user_currency );
 		$processing_fee = Currencies::convertFromUSD( $selected_option['price_usd'], $user_currency );
 		$denial_protection_price = Currencies::convertFromUSD( $denial_protection['price_usd'], $user_currency );
 
@@ -603,6 +618,7 @@ class SiteController extends Controller {
 			'travelers' => $travelers,
 			'price_per_traveler' => $price_per_traveler,
 			'currency_symbol' => $currency_symbol,
+			'currency_config' => $currency_config,
 			'processing_fee' => $processing_fee,
 			'processing_option' => $processing_option,
 			'processing_name' => $selected_option['name'],

@@ -15,17 +15,43 @@
 			<x-progress-steps :current_step="2" />
 		</div>
 
-		<div class="application-details-page" x-data="{
+		<script>
+			document.addEventListener('alpine:init', () => {
+				Alpine.data('applicationDetailsPage', () => ({
 					pricePerTraveler: {{ $price_per_traveler }},
-					currencySymbol: '{{ $currency_symbol }}',
+					currencySymbol: {{ Js::from($currency_symbol) }},
+					currencyConfig: {
+						decimal_places: {{ $currency_config['decimal_places'] }},
+						thousands_separator: {{ Js::from($currency_config['thousands_separator']) }},
+						decimal_separator: {{ Js::from($currency_config['decimal_separator']) }},
+						symbol_position: {{ Js::from($currency_config['symbol_position']) }}
+					},
 					activeTravelers: Array.from({ length: {{ $applicants_count }} }, (_, i) => i + 1),
 					maxTravelers: 10,
 					nextTravelerIndex: {{ $applicants_count + 1 }},
+
+					formatCurrency(amount) {
+						const parts = amount.toFixed(this.currencyConfig.decimal_places).split('.');
+						parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, this.currencyConfig.thousands_separator);
+						const formatted = parts.join(this.currencyConfig.decimal_separator);
+
+						if (this.currencyConfig.symbol_position === 'after') {
+							return formatted + ' ' + this.currencySymbol;
+						} else {
+							return this.currencySymbol + formatted;
+						}
+					},
+
 					get travelerCount() {
 						return this.activeTravelers.length;
 					},
+
 					get totalPrice() {
-						return (this.activeTravelers.length * this.pricePerTraveler).toFixed(2);
+						return (this.activeTravelers.length * this.pricePerTraveler);
+					},
+
+					get formattedTotal() {
+						return this.formatCurrency(this.totalPrice);
 					},
 						hasErrors: false,
 						errors: {},
@@ -149,9 +175,11 @@
 								}
 							}
 						}
-					}"
-					x-on:remove-traveler.window="removeTraveler($event.detail)"
-				>
+					}));
+				});
+		</script>
+
+		<div class="application-details-page" x-data="applicationDetailsPage" x-on:remove-traveler.window="removeTraveler($event.detail)">
 			<div class="application-details-content">
 				<form
 					id="application-details-form"
@@ -235,7 +263,7 @@
 					<div class="order-summary-row">
 						<div class="order-summary-label">@lang('Standard, 3 days')</div>
 						<div class="order-summary-value">
-							<span x-text="currencySymbol"></span><span x-text="totalPrice"></span>
+							<span x-text="formattedTotal"></span>
 						</div>
 					</div>
 				</div>

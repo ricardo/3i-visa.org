@@ -15,56 +15,96 @@
 			<x-progress-steps :current_step="3" />
 		</div> -->
 
-		<div class="application-details-page" x-data="{
-				pricePerTraveler: {{ $price_per_traveler }},
-				currencySymbol: '{{ $currency_symbol }}',
-				travelerCount: {{ $applicants_count }},
-				processingFee: {{ $processing_fee }},
-				denialProtectionPrice: {{ $denial_protection_price }},
-				hasDenialProtection: {{ $has_denial_protection ? 'true' : 'false' }},
-				isSubmitting: false,
-				get baseTotal() {
-					return (this.travelerCount * this.pricePerTraveler).toFixed(2);
-				},
-				get denialProtectionTotal() {
-					return this.hasDenialProtection ? parseFloat(this.denialProtectionPrice) : 0;
-				},
-				get totalPrice() {
-					return (parseFloat(this.baseTotal) + parseFloat(this.processingFee) + this.denialProtectionTotal).toFixed(2);
-				},
-				async submitForm(event) {
-					event.preventDefault();
+		<script>
+			document.addEventListener('alpine:init', () => {
+				Alpine.data('reviewPage', () => ({
+					pricePerTraveler: {{ $price_per_traveler }},
+					currencySymbol: {{ Js::from($currency_symbol) }},
+					currencyConfig: {
+						decimal_places: {{ $currency_config['decimal_places'] }},
+						thousands_separator: {{ Js::from($currency_config['thousands_separator']) }},
+						decimal_separator: {{ Js::from($currency_config['decimal_separator']) }},
+						symbol_position: {{ Js::from($currency_config['symbol_position']) }}
+					},
+					travelerCount: {{ $applicants_count }},
+					processingFee: {{ $processing_fee }},
+					denialProtectionPrice: {{ $denial_protection_price }},
+					hasDenialProtection: {{ $has_denial_protection ? 'true' : 'false' }},
+					isSubmitting: false,
 
-					if (this.isSubmitting) return;
+					formatCurrency(amount) {
+						const parts = amount.toFixed(this.currencyConfig.decimal_places).split('.');
+						parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, this.currencyConfig.thousands_separator);
+						const formatted = parts.join(this.currencyConfig.decimal_separator);
 
-					this.isSubmitting = true;
-
-					const formData = new FormData(event.target);
-
-					try {
-						const response = await axios.post(
-							event.target.action,
-							formData,
-							{
-								headers: {
-									'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
-									'Accept': 'application/json'
-								}
-							}
-						);
-
-						// Success - redirect to next step
-						if (response.data.success) {
-							window.location.href = response.data.redirect;
+						if (this.currencyConfig.symbol_position === 'after') {
+							return formatted + ' ' + this.currencySymbol;
+						} else {
+							return this.currencySymbol + formatted;
 						}
-					} catch (error) {
-						console.error('Failed to submit form:', error);
-					} finally {
-						this.isSubmitting = false;
+					},
+
+					get baseTotal() {
+						return (this.travelerCount * this.pricePerTraveler);
+					},
+
+					get denialProtectionTotal() {
+						return this.hasDenialProtection ? parseFloat(this.denialProtectionPrice) : 0;
+					},
+
+					get totalPrice() {
+						return (parseFloat(this.baseTotal) + parseFloat(this.processingFee) + this.denialProtectionTotal);
+					},
+
+					get formattedTotal() {
+						return this.formatCurrency(this.totalPrice);
+					},
+
+					get formattedDenialProtectionPrice() {
+						return this.formatCurrency(this.denialProtectionPrice);
+					},
+
+					get formattedDenialProtectionPriceOnly() {
+						const parts = this.denialProtectionPrice.toFixed(this.currencyConfig.decimal_places).split('.');
+						parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, this.currencyConfig.thousands_separator);
+						return parts.join(this.currencyConfig.decimal_separator);
+					},
+
+					async submitForm(event) {
+						event.preventDefault();
+
+						if (this.isSubmitting) return;
+
+						this.isSubmitting = true;
+
+						const formData = new FormData(event.target);
+
+						try {
+							const response = await axios.post(
+								event.target.action,
+								formData,
+								{
+									headers: {
+										'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+										'Accept': 'application/json'
+									}
+								}
+							);
+
+							if (response.data.success) {
+								window.location.href = response.data.redirect;
+							}
+						} catch (error) {
+							console.error('Failed to submit form:', error);
+						} finally {
+							this.isSubmitting = false;
+						}
 					}
-				}
-			}"
-		>
+				}));
+			});
+		</script>
+
+		<div class="application-details-page" x-data="reviewPage">
 			<div class="application-details-content">
 				<form
 					id="review-form"
@@ -151,7 +191,7 @@
 							<div class="review-denial-header">
 								@include( 'icons.shield-check' )
 								<label class="review-denial-title">@lang('Add denial protection')</label>
-								<div class="review-denial-price">+ {{ $currency_symbol }}{{ number_format( $denial_protection_price, 2 ) }}</div>
+								<div class="review-denial-price">+ <span x-text="currencySymbol"></span><span x-text="formattedDenialProtectionPriceOnly"></span></div>
 							</div>
 							<div class="review-denial-description">
 								{{ $denial_protection['description'] }}
@@ -174,7 +214,7 @@
 					<div class="order-summary-row">
 						<div class="order-summary-label">{{ $processing_name }}, {{ $processing_days }} {{ $processing_days === 1 ? __('Day') : __('Days') }}</div>
 						<div class="order-summary-value">
-							<span x-text="currencySymbol"></span><span x-text="totalPrice"></span>
+							<span x-text="formattedTotal"></span>
 						</div>
 					</div>
 				</div>
@@ -183,7 +223,7 @@
 				<div class="order-total-section">
 					<div class="order-total-label">@lang('Total')</div>
 					<div class="order-total-price">
-						<span x-text="currencySymbol"></span><span x-text="totalPrice"></span>
+						<span x-text="formattedTotal"></span>
 					</div>
 				</div>
 
@@ -220,7 +260,7 @@
 				<div class="mobile-total-section">
 					<div class="mobile-total-label">@lang('Total')</div>
 					<div class="mobile-total-price">
-						<span x-text="currencySymbol"></span><span x-text="totalPrice"></span>
+						<span x-text="formattedTotal"></span>
 					</div>
 				</div>
 				<button

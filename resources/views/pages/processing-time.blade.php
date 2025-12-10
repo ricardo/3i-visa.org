@@ -15,20 +15,46 @@
 			<x-progress-steps :current_step="3" />
 		</div>
 
-		<div class="application-details-page" x-data="{
-				pricePerTraveler: {{ $price_per_traveler }},
-				currencySymbol: '{{ $currency_symbol }}',
-				travelerCount: {{ $applicants_count }},
-				processingFee: {{ $processing_options[$selected_processing]['price_converted'] }},
-				selectedProcessing: '{{ $selected_processing }}',
-				isSubmitting: false,
-				isUpdating: false,
-				get baseTotal() {
-					return (this.travelerCount * this.pricePerTraveler).toFixed(2);
-				},
-				get totalPrice() {
-					return (parseFloat(this.baseTotal) + parseFloat(this.processingFee)).toFixed(2);
-				},
+		<script>
+			document.addEventListener('alpine:init', () => {
+				Alpine.data('processingTimePage', () => ({
+					pricePerTraveler: {{ $price_per_traveler }},
+					currencySymbol: {{ Js::from($currency_symbol) }},
+					currencyConfig: {
+						decimal_places: {{ $currency_config['decimal_places'] }},
+						thousands_separator: {{ Js::from($currency_config['thousands_separator']) }},
+						decimal_separator: {{ Js::from($currency_config['decimal_separator']) }},
+						symbol_position: {{ Js::from($currency_config['symbol_position']) }}
+					},
+					travelerCount: {{ $applicants_count }},
+					processingFee: {{ $processing_options[$selected_processing]['price_converted'] }},
+					selectedProcessing: {{ Js::from($selected_processing) }},
+					isSubmitting: false,
+					isUpdating: false,
+
+					formatCurrency(amount) {
+						const parts = amount.toFixed(this.currencyConfig.decimal_places).split('.');
+						parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, this.currencyConfig.thousands_separator);
+						const formatted = parts.join(this.currencyConfig.decimal_separator);
+
+						if (this.currencyConfig.symbol_position === 'after') {
+							return formatted + ' ' + this.currencySymbol;
+						} else {
+							return this.currencySymbol + formatted;
+						}
+					},
+
+					get baseTotal() {
+						return (this.travelerCount * this.pricePerTraveler);
+					},
+
+					get totalPrice() {
+						return (parseFloat(this.baseTotal) + parseFloat(this.processingFee));
+					},
+
+					get formattedTotal() {
+						return this.formatCurrency(this.totalPrice);
+					},
 				async updateProcessing(option) {
 					if (this.isUpdating || this.selectedProcessing === option) return;
 
@@ -90,8 +116,11 @@
 						this.isSubmitting = false;
 					}
 				}
-			}"
-		>
+			}));
+		});
+		</script>
+
+		<div class="application-details-page" x-data="processingTimePage">
 			<div class="application-details-content">
 				<form
 					id="processing-time-form"
@@ -131,7 +160,7 @@
 										</label>
 										<div class="processing-option-price">
 											@if( $option['price_usd'] > 0 )
-												+ {{ $currency_symbol }}{{ number_format( $option['price_converted'], 2 ) }}
+												+ {{ \App\Helpers\Currencies::format( $option['price_converted'], $currency_config['code'], true ) }}
 											@else
 												+ {{ $currency_symbol }}0
 											@endif
@@ -163,7 +192,7 @@
 							<span x-show="selectedProcessing === 'rush'">@lang('Rush, 1 day')</span>
 						</div>
 						<div class="order-summary-value">
-							<span x-text="currencySymbol"></span><span x-text="totalPrice"></span>
+							<span x-text="formattedTotal"></span>
 						</div>
 					</div>
 				</div>
@@ -172,7 +201,7 @@
 				<div class="order-total-section">
 					<div class="order-total-label">@lang('Total')</div>
 					<div class="order-total-price">
-						<span x-text="currencySymbol"></span><span x-text="totalPrice"></span>
+						<span x-text="formattedTotal"></span>
 					</div>
 				</div>
 
@@ -209,7 +238,7 @@
 				<div class="mobile-total-section">
 					<div class="mobile-total-label">@lang('Total')</div>
 					<div class="mobile-total-price">
-						<span x-text="currencySymbol"></span><span x-text="totalPrice"></span>
+						<span x-text="formattedTotal"></span>
 					</div>
 				</div>
 				<button
