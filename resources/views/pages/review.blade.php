@@ -31,6 +31,14 @@
 					denialProtectionPrice: {{ $denial_protection_price }},
 					hasDenialProtection: {{ $has_denial_protection ? 'true' : 'false' }},
 					isSubmitting: false,
+					isUpdatingDenialProtection: false,
+
+					init() {
+						// Watch for changes to hasDenialProtection and save to session
+						this.$watch('hasDenialProtection', (value) => {
+							this.updateDenialProtection(value);
+						});
+					},
 
 					formatCurrency(amount) {
 						const parts = amount.toFixed(this.currencyConfig.decimal_places).split('.');
@@ -41,6 +49,36 @@
 							return formatted + ' ' + this.currencySymbol;
 						} else {
 							return this.currencySymbol + formatted;
+						}
+					},
+
+					async updateDenialProtection(value) {
+						if (this.isUpdatingDenialProtection) return;
+
+						this.isUpdatingDenialProtection = true;
+
+						const formData = new FormData();
+						formData.append('denial_protection', value ? '1' : '0');
+
+						try {
+							const response = await axios.post(
+								'{{ route('review.update.denial', ['country' => $country_slug]) }}',
+								formData,
+								{
+									headers: {
+										'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+										'Accept': 'application/json'
+									}
+								}
+							);
+
+							if (response.data.success) {
+								console.log('Denial protection updated:', response.data.has_denial_protection);
+							}
+						} catch (error) {
+							console.error('Failed to update denial protection:', error);
+						} finally {
+							this.isUpdatingDenialProtection = false;
 						}
 					},
 

@@ -57,6 +57,7 @@ Route::group( [
 	// Review page.
 	Route::get( '{country}/review', [ SiteController::class, 'getReview' ] )->name( 'review' );
 	Route::post( '{country}/review', [ SiteController::class, 'postReview' ] )->name( 'review.submit' );
+	Route::post( '{country}/review/update-denial-protection', [ SiteController::class, 'updateDenialProtection' ] )->name( 'review.update.denial' );
 
 	// Auth:Login.
 	Route::post( 'login', [ AuthController::class, 'postLogin' ] )->name( 'login.post' );

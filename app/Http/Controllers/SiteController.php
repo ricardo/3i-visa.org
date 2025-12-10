@@ -655,4 +655,22 @@ class SiteController extends Controller {
 		// For now, redirect back with success message.
 		return redirect()->back()->with( 'success', __( 'Order reviewed!' ) );
 	}
+
+	public function updateDenialProtection( Request $request, $country ) {
+		// Validate denial protection choice.
+		$request->validate( [
+			'denial_protection' => 'required|boolean',
+		] );
+
+		$has_denial_protection = $request->input( 'denial_protection' );
+
+		// Update session.
+		$request->session()->put( 'visa_application.denial_protection', $has_denial_protection );
+
+		// Return success response.
+		return response()->json( [
+			'success' => true,
+			'has_denial_protection' => $has_denial_protection,
+		] );
+	}
 }
