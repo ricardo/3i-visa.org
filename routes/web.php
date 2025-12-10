@@ -49,6 +49,11 @@ Route::group( [
 	Route::get( '{country}/passport-details', [ SiteController::class, 'getPassportDetails' ] )->name( 'passport.details' );
 	Route::post( '{country}/passport-details', [ SiteController::class, 'postPassportDetails' ] )->name( 'passport.details.submit' );
 
+	// Processing time page.
+	Route::get( '{country}/processing-time', [ SiteController::class, 'getProcessingTime' ] )->name( 'processing.time' );
+	Route::post( '{country}/processing-time', [ SiteController::class, 'postProcessingTime' ] )->name( 'processing.time.submit' );
+	Route::post( '{country}/processing-time/update', [ SiteController::class, 'updateProcessingTime' ] )->name( 'processing.time.update' );
+
 	// Auth:Login.
 	Route::post( 'login', [ AuthController::class, 'postLogin' ] )->name( 'login.post' );
 	Route::get( 'login/google', [ AuthController::class, 'getLoginWithGoogle' ] )->name( 'login.google' );

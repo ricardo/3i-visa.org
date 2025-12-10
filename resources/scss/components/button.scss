@@ -9,10 +9,10 @@ a[role="button"], button, button[role="button"], button[type="button"], button[t
 	transition: .2s;
 	box-shadow: inset 0px 1px color-mix( in oklab, #fff 30%, transparent ) !important;
 	border-color: #015638;
-	background-color: $jade-500;
+	background-color: $jade-450;
 
 	&:hover {
-		background-color: $jade-450;
+		background-color: $jade-400;
 
 		.icon-arrow-right {
 			g.head {

@@ -168,6 +168,10 @@ body > header {
 		background-color: var( --3i-h1-color );
 		transition: var( --3i-transition );
 	}
+
+	&:hover {
+		background-color: transparent;
+	}
 }
 
 .user-avatar {

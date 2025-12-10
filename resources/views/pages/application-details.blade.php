@@ -3,7 +3,7 @@
 @section( 'content' )
 	<!-- Mobile Progress Bar -->
 	<div class="display-mobile-only">
-		<x-mobile-progress-bar :current_step="2.5" :total_steps="4" />
+		<x-mobile-progress-bar :current_step="2" :total_steps="4" />
 	</div>
 
 	<main class="container">
@@ -233,7 +233,7 @@
 						</div>
 					</div>
 					<div class="order-summary-row">
-						<div class="order-summary-label">@lang('Standard processing')</div>
+						<div class="order-summary-label">@lang('Standard, 3 days')</div>
 						<div class="order-summary-value">
 							<span x-text="currencySymbol"></span><span x-text="totalPrice"></span>
 						</div>

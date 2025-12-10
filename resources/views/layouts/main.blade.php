@@ -9,7 +9,7 @@
 	<body class="@if ( ! empty( $grid_body ) ) grid @endif @if ( ! empty( $active_chat ) ) active-chat @endif">
 		@include( 'partials.header' )
 
-		<div class="layout">
+		<div class="layout {{ ! empty( $class ) ? $class : '' }}">
 
 			@yield( 'content' )
 

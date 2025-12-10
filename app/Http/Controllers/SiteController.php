@@ -400,12 +400,117 @@ class SiteController extends Controller {
 			return response()->json( [
 				'success' => true,
 				'message' => __( 'Passport information saved!' ),
-				'redirect' => route( 'passport.details', [ 'country' => $country ] ) // TODO: Update to next step route
+				'redirect' => route( 'processing.time', [ 'country' => $country ] )
+			] );
+		}
+
+		// Redirect to processing time page.
+		return redirect()->route( 'processing.time', [ 'country' => $country ] );
+	}
+
+	public function getProcessingTime( Request $request, $country ) {
+		// Slug to country code mapping.
+		$slug_to_code = array_flip( Countries::getCountrySlugs() );
+
+		// Get country code from slug.
+		$country_code = $slug_to_code[ $country ] ?? null;
+
+		if ( ! $country_code ) {
+			abort( 404 );
+		}
+
+		// Get visa application data from session.
+		$visa_data = $request->session()->get( 'visa_application', [] );
+		$travelers = $visa_data['travelers'] ?? null;
+
+		// If no travelers in session, redirect to passport details page.
+		if ( ! $travelers ) {
+			return redirect()->route( 'passport.details', [ 'country' => $country ] );
+		}
+
+		$applicants_count = count( $travelers );
+
+		// Get pricing configuration.
+		$pricing_config = config( 'pricing.colombia' );
+		$base_price_usd = $pricing_config['base_form_price_usd'];
+		$processing_options = $pricing_config['processing_options'];
+
+		// Get selected processing option from session (default to standard).
+		$selected_processing = $visa_data['processing_option'] ?? 'standard';
+
+		// Currency conversion.
+		$user_currency = $request->cookie( 'preferred_currency', 'USD' );
+		$price_per_traveler = Currencies::convertFromUSD( $base_price_usd, $user_currency );
+		$currency_symbol = Currencies::getSymbol( $user_currency );
+
+		// Convert processing fees to user currency.
+		foreach ( $processing_options as $key => $option ) {
+			$processing_options[ $key ]['price_converted'] = Currencies::convertFromUSD(
+				$option['price_usd'],
+				$user_currency
+			);
+		}
+
+		return view( 'pages.processing-time', [
+			'country_name' => Countries::getCountryName( $country_code ),
+			'country_code' => $country_code,
+			'country_slug' => $country,
+			'applicants_count' => $applicants_count,
+			'price_per_traveler' => $price_per_traveler,
+			'currency_symbol' => $currency_symbol,
+			'processing_options' => $processing_options,
+			'selected_processing' => $selected_processing,
+		] );
+	}
+
+	public function updateProcessingTime( Request $request, $country ) {
+		// Validate processing option.
+		$request->validate( [
+			'processing_option' => 'required|string|in:standard,rush',
+		] );
+
+		$processing_option = $request->input( 'processing_option' );
+
+		// Update session.
+		$request->session()->put( 'visa_application.processing_option', $processing_option );
+
+		// Get pricing configuration.
+		$pricing_config = config( 'pricing.colombia' );
+		$selected_option = $pricing_config['processing_options'][ $processing_option ];
+
+		// Get user currency and convert prices.
+		$user_currency = $request->cookie( 'preferred_currency', 'USD' );
+		$processing_fee = Currencies::convertFromUSD( $selected_option['price_usd'], $user_currency );
+
+		// Return success with updated pricing.
+		return response()->json( [
+			'success' => true,
+			'processing_fee' => $processing_fee,
+		] );
+	}
+
+	public function postProcessingTime( Request $request, $country ) {
+		// Validate processing option.
+		$request->validate( [
+			'processing_option' => 'required|string|in:standard,rush',
+		] );
+
+		$processing_option = $request->input( 'processing_option' );
+
+		// Update session.
+		$request->session()->put( 'visa_application.processing_option', $processing_option );
+
+		// Handle Ajax requests.
+		if ( $request->ajax() || $request->wantsJson() ) {
+			return response()->json( [
+				'success' => true,
+				'message' => __( 'Processing time saved!' ),
+				'redirect' => route( 'processing.time', [ 'country' => $country ] ) // TODO: Update to next step route
 			] );
 		}
 
 		// TODO: Redirect to next step (payment or confirmation).
 		// For now, redirect back with success message.
-		return redirect()->back()->with( 'success', __( 'Passport information saved!' ) );
+		return redirect()->back()->with( 'success', __( 'Processing time saved!' ) );
 	}
 }

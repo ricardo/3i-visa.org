@@ -24,6 +24,7 @@
 @use "sections/hero";
 @use "pages/apply";
 @use "pages/application-details";
+@use "pages/processing-time";
 
 // Flag icons for country flags.
 @import "flag-icons/css/flag-icons.css";
@@ -142,6 +143,12 @@ a {
 	}
 }
 
+.hide-mobile {
+	@include respond-to( md ) {
+		display: none !important;
+	}
+}
+
 // TODO: Move
 .grid {
 	&.row {
@@ -161,6 +168,42 @@ a {
 	}
 }
 
+
+// TODO: Move
+.layout.home {
+	background: radial-gradient(circle at 85% 5%, rgba(0, 212, 116, 0.3) 0%, rgba(255, 255, 255, 0.0) 10%),
+      radial-gradient(circle at 5% 11%, rgba(109, 219, 255, 0.20) 0%, rgba(255, 255, 255, 0.0) 10%),
+      radial-gradient(circle at 90% 43%, rgba(0, 212, 116, 0.2) 0%, rgba(255, 255, 255, 0.0) 15%),
+      radial-gradient(circle at 5% 70%, rgba(0, 212, 116, 0.2) 0%, rgba(255, 255, 255, 0.0) 12%),
+      radial-gradient(circle at 95% 86%, rgba(109, 219, 255, 0.2) 0%, rgba(255, 255, 255, 0.0) 12%),
+      #fff;
+}
+
+.home-image {
+	position: relative;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	margin-top: 4rem;
+
+	img.traveler {
+		width: 100%;
+		max-width: 420px;
+		z-index: 1;
+
+		@include respond-to( 'lg' ) {
+			max-width: 300px;
+		}
+	}
+
+	img.line {
+		position: absolute;
+		bottom: 30px;
+		width: 100%;
+	}
+}
 
 
 // TODO: Move
