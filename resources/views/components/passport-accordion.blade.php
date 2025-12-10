@@ -26,6 +26,7 @@
 
 <div
 	class="traveler-accordion"
+	x-bind:class="{ 'is-open': isOpen }"
 	x-data="{
 		isOpen: {{ $initial_expanded ? 'true' : 'false' }},
 		travelerIndex: {{ $traveler_index }},

@@ -141,9 +141,17 @@ class SiteController extends Controller {
 		$visa_data = $request->session()->get( 'visa_application', [] );
 		$nationality = $visa_data['nationality'] ?? null;
 
-		// If no nationality in session, redirect to home.
+		// If no nationality in session, use locale-based default.
 		if ( ! $nationality ) {
-			return redirect()->route( 'home' );
+			// Locale to country code mapping.
+			$locale_to_country = [
+				'en' => 'us',
+				'pt' => 'br',
+				'es' => 'co',
+			];
+
+			$current_locale = app()->getLocale();
+			$nationality = $locale_to_country[ $current_locale ] ?? 'US';
 		}
 
 		// Get country list for dropdown (translated).

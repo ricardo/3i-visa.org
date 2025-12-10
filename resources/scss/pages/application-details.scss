@@ -45,7 +45,10 @@
 .traveler-accordion {
 	border: 1px solid var( --3i-border-color );
 	border-radius: var( --3i-border-radius );
-	overflow: hidden;
+
+	&.is-open .traveler-accordion-header {
+		border-radius: var( --3i-border-radius ) var( --3i-border-radius ) 0 0 ;
+	}
 }
 
 .traveler-accordion-header {
@@ -56,6 +59,8 @@
 	cursor: pointer;
 	user-select: none;
 	background: #F8F9F9;
+	overflow: hidden;
+	border-radius: var( --3i-border-radius );
 }
 
 .traveler-accordion-title {

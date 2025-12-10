@@ -13,6 +13,7 @@
 
 <div
 	class="traveler-accordion"
+	x-bind:class="{ 'is-open': isOpen }"
 	x-data="{
 		isOpen: {{ $initial_expanded ? 'true' : 'false' }},
 		firstName: '{{ old('travelers.'.$traveler_index.'.first_name', $initial_first_name) }}',

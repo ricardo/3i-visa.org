@@ -158,7 +158,7 @@
 							@include( 'icons.calendar' )
 						</div>
 						<div class="review-date-text">
-							{{ $arrival_date->format('l, M j, Y') }}
+							{{ ucfirst( $arrival_date->translatedFormat( 'l, M j, Y' ) ) }}
 						</div>
 					</div>
 
@@ -166,7 +166,7 @@
 					<div class="review-visa-card">
 						<!-- Processing Badge -->
 						<div class="review-processing-badge">
-							{{ $processing_name }} Processing
+							{{ __( $processing_name . ' Processing' ) }}
 						</div>
 
 						<!-- Card Header -->
@@ -181,15 +181,15 @@
 						<div class="review-visa-info">
 							<div class="review-visa-info-item">
 								<span class="review-visa-label">@lang('Valid for:') </span>
-								<span class="review-visa-value">{{ $visa_details['valid_for_description'] }}</span>
+								<span class="review-visa-value">{{ __( $visa_details['valid_for_description'] ) }}</span>
 							</div>
 							<div class="review-visa-info-item">
 								<span class="review-visa-label">@lang('Max stay:') </span>
-								<span class="review-visa-value">{{ $visa_details['max_stay_description'] }}</span>
+								<span class="review-visa-value">{{ __( $visa_details['max_stay_description'] ) }}</span>
 							</div>
 							<div class="review-visa-info-item">
 								<span class="review-visa-label">@lang('Number of entries:') </span>
-								<span class="review-visa-value">{{ $visa_details['entries_description'] }}</span>
+								<span class="review-visa-value">{{ __( $visa_details['entries_description'] ) }}</span>
 							</div>
 						</div>
 
@@ -250,7 +250,7 @@
 						</div>
 					</div>
 					<div class="order-summary-row">
-						<div class="order-summary-label">{{ $processing_name }}, {{ $processing_days }} {{ $processing_days === 1 ? __('Day') : __('Days') }}</div>
+						<div class="order-summary-label">{{ __( $processing_name ) }}, {{ $processing_days }} {{ $processing_days === 1 ? __( 'Day' ) : __( 'Days' ) }}</div>
 						<div class="order-summary-value">
 							<span x-text="formattedTotal"></span>
 						</div>

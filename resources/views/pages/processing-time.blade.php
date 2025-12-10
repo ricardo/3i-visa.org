@@ -156,7 +156,7 @@
 								<div class="processing-option-content">
 									<div class="processing-option-header">
 										<label for="processing-{{ $key }}" class="processing-option-name">
-											{{ $option['name'] }}
+											{{ __( $option['name'] ) }}
 										</label>
 										<div class="processing-option-price">
 											@if( $option['price_usd'] > 0 )
@@ -167,7 +167,7 @@
 										</div>
 									</div>
 									<div class="processing-option-description">
-										{{ $option['description'] }}
+										{{ __( $option['description'] ) }}
 									</div>
 								</div>
 							</div>
@@ -183,13 +183,13 @@
 					<div class="order-summary-row">
 						<div class="order-summary-title">@lang(':country Check-MIG Form', ['country' => $country_name])</div>
 						<div class="order-summary-value">
-							<span x-text="travelerCount"></span> <span x-text="travelerCount === 1 ? '@lang('traveler')' : '@lang('travelers')'"></span>
+							<span x-text="travelerCount"></span> <span x-text="travelerCount === 1 ? '@lang( 'traveler' )' : '@lang( 'travelers' )'"></span>
 						</div>
 					</div>
 					<div class="order-summary-row">
 						<div class="order-summary-label">
-							<span x-show="selectedProcessing === 'standard'">@lang('Standard, 3 days')</span>
-							<span x-show="selectedProcessing === 'rush'">@lang('Rush, 1 day')</span>
+							<span x-show="selectedProcessing === 'standard'">@lang( 'Standard, 3 days' )</span>
+							<span x-show="selectedProcessing === 'rush'">@lang( 'Rush, 1 day' )</span>
 						</div>
 						<div class="order-summary-value">
 							<span x-text="formattedTotal"></span>
