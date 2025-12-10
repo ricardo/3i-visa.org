@@ -132,31 +132,31 @@
 					</div>
 
 					<!-- Denial Protection -->
-					<div class="review-denial-protection">
-						<div class="review-denial-header">
-							<div class="review-denial-icon">
-								@include('icons.shield-check')
+					<div
+						class="review-denial-protection"
+						x-bind:class="{ 'selected': hasDenialProtection }"
+						x-on:click="hasDenialProtection = !hasDenialProtection"
+					>
+						<div class="review-denial-checkbox">
+							<input
+								type="checkbox"
+								name="denial_protection"
+								id="denial_protection"
+								value="1"
+								x-model="hasDenialProtection"
+								@if($has_denial_protection) checked @endif
+							>
+						</div>
+						<div class="review-denial-content">
+							<div class="review-denial-header">
+								@include( 'icons.shield-check' )
+								<label class="review-denial-title">@lang('Add denial protection')</label>
+								<div class="review-denial-price">+ {{ $currency_symbol }}{{ number_format( $denial_protection_price, 2 ) }}</div>
 							</div>
-							<div class="review-denial-content">
-								<div class="review-denial-title">@lang('Add denial protection')</div>
-								<div class="review-denial-price">{{ $currency_symbol }}{{ number_format( $denial_protection_price, 2 ) }}</div>
-							</div>
-							<div class="review-denial-checkbox">
-								<input
-									type="checkbox"
-									name="denial_protection"
-									id="denial_protection"
-									value="1"
-									x-model="hasDenialProtection"
-									@if($has_denial_protection) checked @endif
-								>
-								<label for="denial_protection"></label>
+							<div class="review-denial-description">
+								{{ $denial_protection['description'] }}
 							</div>
 						</div>
-						<div class="review-denial-description">
-							{{ $denial_protection['description'] }}
-						</div>
-						<a href="#" class="review-denial-learn-more">@lang('Learn more')</a>
 					</div>
 				</form>
 			</div>
