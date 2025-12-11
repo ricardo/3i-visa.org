@@ -27,8 +27,9 @@ Route::group( [
 
 	Route::get( 'contact', [ SiteController::class, 'getContactPage' ] )->name( 'contact' );
 	Route::post( 'contact', [ SiteController::class, 'postContactForm' ] )->name( 'contact' );
-	Route::get( 'terms', [ SiteController::class, 'getTerms' ] )->name( 'terms' );
-	Route::get( 'privacy', [ SiteController::class, 'getPrivacy' ] )->name( 'privacy' );
+	Route::get( 'terms-of-service', [ SiteController::class, 'getTermsOfService' ] )->name( 'terms-of-service' );
+	Route::get( 'privacy-policy', [ SiteController::class, 'getPrivacyPolicy' ] )->name( 'privacy-policy' );
+	Route::get( 'refund-policy', [ SiteController::class, 'getRefundPolicy' ] )->name( 'refund-policy' );
 
 	// Language switcher.
 	Route::post( 'language/switch', [ SiteController::class, 'postSwitchLanguage' ] )->name( 'language.switch' );

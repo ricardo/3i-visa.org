@@ -13,6 +13,18 @@ class SiteController extends Controller {
 		return view( 'pages.home' );
 	}
 
+	public function getTermsOfService() {
+		return view( 'pages.terms-of-service' );
+	}
+
+	public function getPrivacyPolicy() {
+		return view( 'pages.privacy-policy' );
+	}
+
+	public function getRefundPolicy() {
+		return view( 'pages.refund-policy' );
+	}
+
 	public function postSwitchLanguage( Request $request ) {
 		$new_locale = $request->input( 'locale' );
 		$supported_locales = array_keys( config( 'app.supported_locales' ) );

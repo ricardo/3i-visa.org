@@ -69,7 +69,7 @@
 			<button type="submit">@lang( 'Sign Up' )</button>
 
 			<p class="mt-4 mb-0 fs-0 color-muted">
-				@lang( 'By signing up, you confirm you are at least 18 years of age, and agree to our' ) <a href="{{ route( 'terms' ) }}" target="_blank" class="color-muted">@lang( 'Terms of Service' )</a> @lang( 'and' ) <a href="{{ route( 'privacy' ) }}" target="_blank" class="color-muted">@lang( 'Privacy Policy' )</a>.
+				@lang( 'By signing up, you confirm you are at least 18 years of age, and agree to our' ) <a href="{{ route( 'terms-of-service' ) }}" target="_blank" class="color-muted">@lang( 'Terms of Service' )</a> @lang( 'and' ) <a href="{{ route( 'privacy-policy' ) }}" target="_blank" class="color-muted">@lang( 'Privacy Policy' )</a>.
 			</p>
 		</form>
 	</article>

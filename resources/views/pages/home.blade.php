@@ -23,7 +23,7 @@
 	$pre_selected_passport = $locale_country_map[ $current_locale ] ?? $locale_country_map['en'];
 @endphp
 @extends( 'layouts/main', [ 'class' => 'home' ] )
-@section( 'title', __( 'Home' ) . ' • 3i Visa' )
+@section( 'title', __( 'International Visa Processing & Entry Requirements Portal' ) . ' • 3i Visa' )
 @section( 'content' )
 	<main class="landing">
 		<section class="hero medium container">
@@ -211,10 +211,84 @@
 			</div>
 		</section>
 
+		<section class="stats-section">
+			<div class="container">
+				<div class="stats">
+					<div class="stat">
+						<div class="stat__number">99%</div>
+						<div class="stat__label">@lang( 'worldwide approval rate' )</div>
+					</div>
 
+					<div class="stat">
+						<div class="stat__number">10+</div>
+						<div class="stat__label">@lang( 'years of experience' )</div>
+					</div>
 
-		<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-		<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-		<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+					<div class="stat">
+						<div class="stat__number">24/7</div>
+						<div class="stat__label">
+							@lang( 'assistance in your language' )
+						</div>
+					</div>
+
+					<div class="stat">
+						<div class="stat__number">200+</div>
+						<div class="stat__label">
+							@lang( 'passport nationalities served' )
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section class="easy-process">
+			<div class="container">
+
+				<h2>@lang('Our easy process')</h2>
+
+				<div class="easy-process__grid">
+
+					<div class="easy-process__image">
+						<img src="/images/easy-process.webp" alt="@lang('Travelers checking visa info')">
+					</div>
+
+					<div class="easy-process__steps">
+
+						<div class="step">
+							<div class="step__number">
+								<span>01</span>
+							</div>
+							<div class="step__content">
+								<h3>@lang('Find your visa')</h3>
+								<p>@lang('Use our visa checker to see exactly what you need. No guesswork.')</p>
+							</div>
+						</div>
+
+						<div class="step">
+							<div class="step__number">
+								<span>02</span>
+							</div>
+							<div class="step__content">
+								<h3>@lang('Apply and pay in under 10 minutes')</h3>
+								<p>@lang('Fill out your travel details and pay securely. Then, upload any other required docs.')</p>
+							</div>
+						</div>
+
+						<div class="step">
+							<div class="step__number">
+								<span>03</span>
+							</div>
+							<div class="step__content">
+								<h3>@lang('We\'ll handle the rest')</h3>
+								<p>@lang('Our AI technology + human experts check everything to ensure a smooth approval.')</p>
+							</div>
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</section>
 	</main>
 @endsection
