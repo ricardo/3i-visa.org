@@ -111,12 +111,10 @@
 .traveler-field {
 	display: flex;
 	flex-direction: column;
-	gap: 0.5rem;
 
 	label {
 		font-weight: 600;
 		color: var( --3i-h1-color );
-		margin-bottom: 0;
 	}
 
 	input[type="text"],

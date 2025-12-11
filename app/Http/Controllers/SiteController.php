@@ -818,45 +818,73 @@ class SiteController extends Controller {
 		// Get payment intent ID from query string.
 		$payment_intent_id = $request->query( 'payment_intent' );
 
-		if ( ! $payment_intent_id ) {
+		// Get optional order number from query string (for viewing specific orders)
+		$requested_order_number = $request->query( 'order_number' );
+
+		if ( ! $payment_intent_id && ! $requested_order_number ) {
 			return redirect()->route( 'apply', [ 'country' => $country ] )
 				->with( 'error', __( 'Invalid payment session.' ) );
 		}
 
-		// Find application by payment intent ID.
-		$application = \App\Models\VisaApplication::where( 'stripe_payment_intent_id', $payment_intent_id )
-			->first();
+		// Find application by payment intent ID or order number
+		if ( $payment_intent_id ) {
+			$application = \App\Models\VisaApplication::where( 'stripe_payment_intent_id', $payment_intent_id )
+				->first();
+		} elseif ( $requested_order_number ) {
+			// When viewing a specific order, must be authenticated
+			if ( ! auth()->check() ) {
+				return redirect()->route( 'login' )
+					->with( 'error', __( 'Please log in to view your orders.' ) );
+			}
+			$application = \App\Models\VisaApplication::where( 'order_number', $requested_order_number )
+				->where( 'user_id', auth()->id() )
+				->first();
+		}
 
 		if ( ! $application ) {
 			return redirect()->route( 'apply', [ 'country' => $country ] )
 				->with( 'error', __( 'Payment session not found.' ) );
 		}
 
-		// Verify payment with Stripe.
-		$stripe_secret = config( 'cashier.secret' );
-		\Stripe\Stripe::setApiKey( $stripe_secret );
+		// Only verify payment with Stripe if we have a payment intent ID (new payment)
+		if ( $payment_intent_id ) {
+			$stripe_secret = config( 'cashier.secret' );
+			\Stripe\Stripe::setApiKey( $stripe_secret );
 
-		try {
-			$payment_intent = \Stripe\PaymentIntent::retrieve( $payment_intent_id );
+			try {
+				$payment_intent = \Stripe\PaymentIntent::retrieve( $payment_intent_id );
 
-			// Check if payment was successful.
-			if ( $payment_intent->status === 'succeeded' ) {
-				// Update application status to paid.
-				$application->status = 'paid';
-				$application->paid_at = now();
-				$application->save();
-			} else {
-				// Payment not successful.
+				// Check if payment was successful.
+				if ( $payment_intent->status === 'succeeded' ) {
+					// Update application status to paid.
+					$application->status = 'paid';
+					$application->paid_at = now();
+					$application->save();
+
+					// Create or associate user account
+					$this->createOrAssociateUser( $application );
+				} else {
+					// Payment not successful.
+					return redirect()->route( 'apply', [ 'country' => $country ] )
+						->with( 'error', __( 'Payment was not successful. Please try again.' ) );
+				}
+			} catch ( \Exception $e ) {
 				return redirect()->route( 'apply', [ 'country' => $country ] )
-					->with( 'error', __( 'Payment was not successful. Please try again.' ) );
+					->with( 'error', __( 'Error verifying payment. Please contact support.' ) );
 			}
-		} catch ( \Exception $e ) {
-			return redirect()->route( 'apply', [ 'country' => $country ] )
-				->with( 'error', __( 'Error verifying payment. Please contact support.' ) );
 		}
 
 		// Load travelers for display.
-		$application->load( 'travelers' );
+		$application->load( 'travelers', 'primaryContact' );
+
+		// Get all applications for this user (for order dropdown)
+		$user_applications = [];
+		if ( auth()->check() ) {
+			$user_applications = \App\Models\VisaApplication::where( 'user_id', auth()->id() )
+				->whereIn( 'status', [ 'paid', 'processing', 'approved', 'completed' ] )
+				->orderBy( 'paid_at', 'desc' )
+				->get();
+		}
 
 		// Get pricing configuration (use slug, not code).
 		$pricing_config = config( "pricing.{$country}" );
@@ -875,10 +903,89 @@ class SiteController extends Controller {
 			'country_code' => $country_code,
 			'country_slug' => $country,
 			'application' => $application,
+			'user_applications' => $user_applications,
 			'currency_symbol' => $currency_symbol,
 			'currency_config' => $currency_config,
 			'total_amount' => $total_amount,
 			'pricing_config' => $pricing_config,
+			'is_new_payment' => $payment_intent_id !== null,
 		] );
+	}
+
+	/**
+	 * Create or associate user account after successful payment.
+	 *
+	 * @param \App\Models\VisaApplication $application
+	 * @return void
+	 */
+	protected function createOrAssociateUser( $application ) {
+		// Get primary contact details
+		$primary_contact = $application->primaryContact;
+
+		if ( ! $primary_contact || ! $primary_contact->email ) {
+			\Log::warning( 'Cannot create user account: No primary contact email', [
+				'application_id' => $application->id,
+			] );
+			return;
+		}
+
+		$email = $primary_contact->email;
+		$first_name = $primary_contact->first_name;
+		$last_name = $primary_contact->last_name;
+		$marketing_optin = $primary_contact->marketing_optin ?? false;
+
+		// Check if user already exists
+		$user = \App\Models\User::where( 'email', $email )->first();
+		$is_new_user = false;
+
+		if ( ! $user ) {
+			// Create new user
+			try {
+				$user = \App\Models\User::create( [
+					'first_name' => $first_name,
+					'last_name' => $last_name,
+					'email' => $email,
+					'locale' => $application->locale ?? app()->getLocale(),
+					'email_notifications' => true,
+					'marketing_optin' => $marketing_optin,
+					'role' => 'user',
+					// Note: password is intentionally NOT set - it will be null until user sets it via password reset link
+				] );
+
+				$is_new_user = true;
+
+				\Log::info( 'New user account created after payment', [
+					'user_id' => $user->id,
+					'email' => $email,
+					'application_id' => $application->id,
+				] );
+			} catch ( \Exception $e ) {
+				\Log::error( 'Failed to create user account', [
+					'email' => $email,
+					'error' => $e->getMessage(),
+					'application_id' => $application->id,
+				] );
+				return;
+			}
+		}
+
+		// Associate application with user
+		$application->user_id = $user->id;
+		$application->save();
+
+		// Only auto-login NEW users
+		if ( $is_new_user && ! auth()->check() ) {
+			auth()->login( $user );
+
+			// Send welcome email with password reset link
+			try {
+				$user->notify( new \App\Notifications\WelcomeUserWithPasswordReset( $application ) );
+			} catch ( \Exception $e ) {
+				\Log::error( 'Failed to send welcome email', [
+					'user_id' => $user->id,
+					'error' => $e->getMessage(),
+				] );
+			}
+		}
 	}
 }

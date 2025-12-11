@@ -15,7 +15,7 @@
 					@include( 'icons.globe' )
 				</a>
 
-				<a href="javascript: void(0);" role="button" class="white header-button" onClick="window.openDialog( '#dialog-auth', '#login' );">@lang( 'Log in' )</a>
+				<a href="{{ route( 'login' ) }}" role="button" class="white header-button">@lang( 'Log in' )</a>
 
 				<button id="menu-toggle" class="nav-toggle display-mobile-only" aria-label="Open menu">
 					<span></span>
@@ -48,7 +48,4 @@
 		</div>
 	@endguest
 </header>
-@guest
-	@include( 'dialogs.auth', [ 'open' => Request::has( 'auth' ) ] )
-@endguest
 @include( 'dialogs.language-switcher' )

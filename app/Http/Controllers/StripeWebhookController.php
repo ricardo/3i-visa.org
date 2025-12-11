@@ -108,13 +108,101 @@ class StripeWebhookController extends Controller {
 				'payment_intent_id' => $payment_intent_id,
 			] );
 
-			// TODO: Send confirmation email to customer
-			// TODO: Notify admin of new paid application
+			// Create or associate user account
+			$this->createOrAssociateUser( $application );
 		} else {
 			Log::info( 'Stripe webhook: Application already marked as paid', [
 				'application_id' => $application->id,
 				'payment_intent_id' => $payment_intent_id,
 			] );
+		}
+	}
+
+	/**
+	 * Create or associate user account after successful payment.
+	 *
+	 * @param \App\Models\VisaApplication $application
+	 * @return void
+	 */
+	protected function createOrAssociateUser( $application ) {
+		// Load primary contact if not already loaded
+		if ( ! $application->relationLoaded( 'primaryContact' ) ) {
+			$application->load( 'primaryContact' );
+		}
+
+		$primary_contact = $application->primaryContact;
+
+		if ( ! $primary_contact || ! $primary_contact->email ) {
+			Log::warning( 'Stripe webhook: Cannot create user account - No primary contact email', [
+				'application_id' => $application->id,
+			] );
+			return;
+		}
+
+		$email = $primary_contact->email;
+		$first_name = $primary_contact->first_name;
+		$last_name = $primary_contact->last_name;
+		$marketing_optin = $primary_contact->marketing_optin ?? false;
+
+		// Check if user already exists
+		$user = \App\Models\User::where( 'email', $email )->first();
+		$is_new_user = false;
+
+		if ( ! $user ) {
+			// Create new user
+			try {
+				$user = \App\Models\User::create( [
+					'first_name' => $first_name,
+					'last_name' => $last_name,
+					'email' => $email,
+					'locale' => $application->locale ?? app()->getLocale(),
+					'email_notifications' => true,
+					'marketing_optin' => $marketing_optin,
+					'role' => 'user',
+					// Note: password is intentionally NOT set - it will be null until user sets it via password reset link
+				] );
+
+				$is_new_user = true;
+
+				Log::info( 'Stripe webhook: New user account created', [
+					'user_id' => $user->id,
+					'email' => $email,
+					'application_id' => $application->id,
+				] );
+			} catch ( \Exception $e ) {
+				Log::error( 'Stripe webhook: Failed to create user account', [
+					'email' => $email,
+					'error' => $e->getMessage(),
+					'application_id' => $application->id,
+				] );
+				return;
+			}
+		}
+
+		// Associate application with user if not already associated
+		if ( ! $application->user_id ) {
+			$application->user_id = $user->id;
+			$application->save();
+
+			Log::info( 'Stripe webhook: Application associated with user', [
+				'user_id' => $user->id,
+				'application_id' => $application->id,
+			] );
+		}
+
+		// Send welcome email for NEW users only
+		if ( $is_new_user ) {
+			try {
+				$user->notify( new \App\Notifications\WelcomeUserWithPasswordReset( $application ) );
+				Log::info( 'Stripe webhook: Welcome email sent to new user', [
+					'user_id' => $user->id,
+				] );
+			} catch ( \Exception $e ) {
+				Log::error( 'Stripe webhook: Failed to send welcome email', [
+					'user_id' => $user->id,
+					'error' => $e->getMessage(),
+				] );
+			}
 		}
 	}
 

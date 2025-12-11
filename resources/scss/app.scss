@@ -19,6 +19,7 @@
 @use "components/stepper";
 @use "components/language-switcher";
 @use "components/footer";
+@use "components/alert";
 
 @use "auth";
 @use "sections/hero";
@@ -53,6 +54,8 @@
 
 	// --3i-h1-color: black !important;
 	--3i-text-selection-color: #{$jade-100} !important;
+
+	--3i-switch-background-color: #DEDEDD !important;
 
 }
 

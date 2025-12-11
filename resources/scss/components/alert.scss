@@ -1,0 +1,31 @@
+.alert-banner {
+	border-radius: var( --3i-border-radius );
+	padding: 1rem 1.5rem;
+	margin-bottom: 1.5rem;
+
+	.alert-banner-content {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		font-size: .9rem;
+
+		.alert-banner-icon {
+			flex-shrink: 0;
+			width: 1.5rem;
+			height: 1.5rem;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			svg {
+				width: 100%;
+				height: 100%;
+				color: currentColor;
+			}
+		}
+
+		strong {
+			font-weight: 600;
+		}
+	}
+}

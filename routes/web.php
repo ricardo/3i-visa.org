@@ -68,19 +68,18 @@ Route::group( [
 	Route::get( '{country}/payment/success', [ SiteController::class, 'paymentSuccess' ] )->name( 'payment.success' );
 
 	// Auth:Login.
+	Route::get( 'login', [ AuthController::class, 'getLogin' ] )->name( 'login' );
+	Route::post( 'login/check-email', [ AuthController::class, 'checkEmail' ] )->name( 'login.check-email' );
 	Route::post( 'login', [ AuthController::class, 'postLogin' ] )->name( 'login.post' );
-	Route::get( 'login/google', [ AuthController::class, 'getLoginWithGoogle' ] )->name( 'login.google' );
-	Route::get( 'login/google/callback', [ AuthController::class, 'handleGoogleCallback' ] );
 
 	// Auth:Signup.
 	Route::post( 'signup/email', [ AuthController::class, 'postSignup' ] )->name( 'signup.email' );
 	Route::get( 'signup/verify', [ AuthController::class, 'getSignupVerifyEmail' ] )->name( 'signup.verify' );
-	Route::get( 'signup/google', [ AuthController::class, 'getSignupWithGoogle' ] )->name( 'signup.google' );
 
 	// Auth:ResetPassword.
 	Route::post( 'password/request', [ AuthController::class, 'postPasswordRequest' ] )->name( 'password.email' );
 	Route::get( 'password/reset/{token?}', [ AuthController::class, 'getPasswordResetPage' ] )->name( 'password.reset' );
-	Route::post( 'password/reset', [ AuthController::class, 'postPasswordReset' ] )->name( 'password.reset.post' );
+	Route::post( 'password/reset', [ AuthController::class, 'postPasswordReset' ] )->name( 'password.update' );
 
 	// Auth:Logout.
 	Route::get( 'logout', [ AuthController::class, 'logout' ] )->name( 'logout' );
