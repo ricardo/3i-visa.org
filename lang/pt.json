@@ -1,5 +1,5 @@
 {
-    "Home": "Início",
+    "International Visa Processing & Entry Requirements Portal": "Processamento de Vistos Internacionais e Requisitos de Entrada",
     "The": "A",
     "easiest": "maneira mais fácil",
     "way to get your travel visa": "de obter seu visto de viagem",
@@ -88,7 +88,6 @@
     "Rush": "Urgente",
     "Rush, 1 day": "Urgente, 1 dia",
     "1 day processing": "Processamento em 1 dia",
-    "Day": "Dia",
     "Days": "Dias",
     "Review Your Order": "Revise Seu Pedido",
     "Review your order": "Revise seu pedido",
@@ -106,5 +105,16 @@
     "Select language...": "Selecione o idioma...",
     "Currency": "Moeda",
     "Select currency...": "Selecione a moeda...",
-    "Save preferences": "Salvar preferências"
+    "Save preferences": "Salvar preferências",
+    "Pay now": "Pagar agora",
+    "Processing...": "Processando...",
+    "Loading payment form...": "Carregando formulário de pagamento...",
+    "Invalid country.": "País inválido.",
+    "Please complete all steps before payment.": "Por favor, complete todas as etapas antes do pagamento.",
+    "Failed to create payment. Please try again.": "Falha ao criar pagamento. Por favor, tente novamente.",
+    "Server returned invalid response": "O servidor retornou uma resposta inválida",
+    "Failed to initialize payment": "Falha ao inicializar pagamento",
+    "Failed to initialize payment. Please try again.": "Falha ao inicializar pagamento. Por favor, tente novamente.",
+    "Payment not initialized": "Pagamento não inicializado",
+    "An unexpected error occurred.": "Ocorreu um erro inesperado."
 }

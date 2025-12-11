@@ -17,6 +17,7 @@ class VisaApplication extends Model {
     protected $fillable = [
         'uuid',
         'user_id',
+        'session_id',
         'order_number',
         'status',
         'destination_country_code',

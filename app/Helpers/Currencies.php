@@ -75,6 +75,29 @@ class Currencies {
 	}
 
 	/**
+	 * Get exchange rate for a currency (1 USD = X target currency).
+	 * Uses database rates from CurrencyService, with fallback to hardcoded rates.
+	 *
+	 * @param string $target_currency Target currency code (USD, BRL, COP)
+	 * @return float Exchange rate
+	 */
+	public static function getExchangeRate( $target_currency ) {
+		if ( $target_currency === 'USD' ) {
+			return 1.0;
+		}
+
+		// Try to get from database
+		$rate = \App\Models\ExchangeRate::getRate( $target_currency );
+
+		// Fallback to hardcoded rates
+		if ( $rate === null ) {
+			$rate = self::$fallback_rates[ $target_currency ] ?? 1.0;
+		}
+
+		return $rate;
+	}
+
+	/**
 	 * Convert amount from USD to target currency.
 	 * Uses database rates from CurrencyService, with fallback to hardcoded rates.
 	 *

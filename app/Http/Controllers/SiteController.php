@@ -4,10 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Countries;
 use App\Helpers\Currencies;
+use App\Services\VisaApplicationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 
 class SiteController extends Controller {
+
+	protected $visaService;
+
+	public function __construct( VisaApplicationService $visaService ) {
+		$this->visaService = $visaService;
+	}
 
 	public function getHomePage() {
 		return view( 'pages.home' );
@@ -125,14 +132,17 @@ class SiteController extends Controller {
 			] );
 		}
 
-		// Store nationality (passport) in session.
-		// Use dot notation to preserve existing data (applicants, travelers, etc.)
-		$request->session()->put( 'visa_application.nationality', $passport );
-		$request->session()->put( 'visa_application.destination', $destination );
-
 		// Get destination slug.
 		$country_slugs = Countries::getCountrySlugs();
 		$destination_slug = $country_slugs[ $destination ] ?? $destination;
+
+		// Find or create draft application for the destination country.
+		$user = auth()->user();
+		$application = $this->visaService->findOrCreateDraft( strtoupper( $destination ), $user );
+
+		// Store nationality in the draft application.
+		$application->nationality_country_code = strtoupper( $passport );
+		$application->save();
 
 		// Redirect to apply page.
 		return redirect()->route( 'apply', [ 'country' => $destination_slug ] );
@@ -149,11 +159,14 @@ class SiteController extends Controller {
 			abort( 404 );
 		}
 
-		// Get visa application data from session.
-		$visa_data = $request->session()->get( 'visa_application', [] );
-		$nationality = $visa_data['nationality'] ?? null;
+		// Find or create draft application for this country
+		$user = auth()->user();
+		$application = $this->visaService->findOrCreateDraft( $country_code, $user );
 
-		// If no nationality in session, use locale-based default.
+		// Get nationality from draft application (convert to lowercase for comparison)
+		$nationality = $application->nationality_country_code ? strtolower( $application->nationality_country_code ) : null;
+
+		// If no nationality in draft, use locale-based default.
 		if ( ! $nationality ) {
 			// Locale to country code mapping.
 			$locale_to_country = [
@@ -163,7 +176,7 @@ class SiteController extends Controller {
 			];
 
 			$current_locale = app()->getLocale();
-			$nationality = $locale_to_country[ $current_locale ] ?? 'US';
+			$nationality = $locale_to_country[ $current_locale ] ?? 'us';
 		}
 
 		// Get country list for dropdown (translated).
@@ -184,6 +197,7 @@ class SiteController extends Controller {
 			'country_slug' => $country,
 			'visa_countries' => $visa_countries,
 			'selected_nationality' => $selected_nationality,
+			'application' => $application,
 		] );
 	}
 
@@ -195,12 +209,23 @@ class SiteController extends Controller {
 			'applicants' => 'required|integer|min:1|max:10',
 		] );
 
-		$nationality = $request->input( 'nationality' );
-		$applicants = $request->input( 'applicants' );
+		// Slug to country code mapping.
+		$slug_to_code = array_flip( Countries::getCountrySlugs() );
+		$country_code = $slug_to_code[ $country ] ?? null;
 
-		// Store in session.
-		$request->session()->put( 'visa_application.applicants', $applicants );
-		$request->session()->put( 'visa_application.nationality', $nationality );
+		if ( ! $country_code ) {
+			abort( 404 );
+		}
+
+		// Find or create draft application
+		$user = auth()->user();
+		$application = $this->visaService->findOrCreateDraft( $country_code, $user );
+
+		// Update application with form data
+		$this->visaService->updateApplication( $application->id, [
+			'nationality' => $request->input( 'nationality' ),
+			'applicants' => $request->input( 'applicants' ),
+		], 'apply' );
 
 		// Redirect to application details page.
 		return redirect()->route( 'application.details', [ 'country' => $country ] );
@@ -217,46 +242,53 @@ class SiteController extends Controller {
 			abort( 404 );
 		}
 
-		// Get visa application data from session.
-		$visa_data = $request->session()->get( 'visa_application', [] );
-		$existing_travelers = $visa_data['travelers'] ?? [];
+		// Find or create draft application
+		$user = auth()->user();
+		$application = $this->visaService->findOrCreateDraft( $country_code, $user );
 
-		// Use the explicitly set applicants count if available,
-		// otherwise fall back to counting existing travelers
-		$applicants_count = $visa_data['applicants']
-			?? ( ! empty( $existing_travelers ) ? count( $existing_travelers ) : null );
-
-		// If no applicants count in session, redirect to apply page.
-		if ( ! $applicants_count ) {
+		// If no applicants set, redirect to apply page
+		if ( ! $application->number_of_travelers ) {
 			return redirect()->route( 'apply', [ 'country' => $country ] );
 		}
 
-		// Store country name in session for use in form.
-		$country_name = Countries::getCountryName( $country_code );
-		$request->session()->put( 'visa_application.destination_name', $country_name );
+		// Load existing travelers from database
+		$existing_travelers = $application->travelers->keyBy( 'traveler_index' )->toArray();
 
 		// Pricing and currency conversion.
 		$base_price_usd = 49; // Base price per traveler in USD.
 		$user_currency = $request->cookie( 'preferred_currency', 'USD' );
 		$price_per_traveler = Currencies::convertFromUSD( $base_price_usd, $user_currency );
-		$total_price = $price_per_traveler * $applicants_count;
+		$total_price = $price_per_traveler * $application->number_of_travelers;
 		$currency_symbol = Currencies::getSymbol( $user_currency );
 		$currency_config = Currencies::getCurrencyConfig( $user_currency );
 
 		return view( 'pages.application-details', [
-			'country_name' => $country_name,
+			'country_name' => Countries::getCountryName( $country_code ),
 			'country_code' => $country_code,
 			'country_slug' => $country,
-			'applicants_count' => $applicants_count,
+			'applicants_count' => $application->number_of_travelers,
 			'existing_travelers' => $existing_travelers,
 			'price_per_traveler' => $price_per_traveler,
 			'total_price' => $total_price,
 			'currency_symbol' => $currency_symbol,
 			'currency_config' => $currency_config,
+			'application' => $application,
 		] );
 	}
 
 	public function postApplicationDetails( Request $request, $country ) {
+		// Slug to country code mapping.
+		$slug_to_code = array_flip( Countries::getCountrySlugs() );
+		$country_code = $slug_to_code[ $country ] ?? null;
+
+		if ( ! $country_code ) {
+			abort( 404 );
+		}
+
+		// Find draft application
+		$user = auth()->user();
+		$application = $this->visaService->findOrCreateDraft( $country_code, $user );
+
 		// Get actual submitted travelers.
 		$submitted_travelers = $request->input( 'travelers', [] );
 
@@ -298,42 +330,13 @@ class SiteController extends Controller {
 		// Validate inputs.
 		$request->validate( $rules, [], $attributes );
 
-		// Get existing visa application data from session.
-		$visa_data = $request->session()->get( 'visa_application', [] );
-		$existing_travelers = $visa_data['travelers'] ?? [];
+		// Save travelers to database
+		$this->visaService->saveTravelers( $application->id, $submitted_travelers );
 
-		// Build new travelers array with only submitted travelers,
-		// merging with existing data where available (to preserve passport info).
-		$new_travelers = [];
-		$is_first_index = true;
-		foreach ( $submitted_travelers as $index => $application_data ) {
-			if ( isset( $existing_travelers[ $index ] ) ) {
-				// Merge new application data with existing traveler data (preserves passport info)
-				$new_travelers[ $index ] = array_merge(
-					$existing_travelers[ $index ],
-					$application_data
-				);
-			} else {
-				// New traveler, just add it
-				$new_travelers[ $index ] = $application_data;
-			}
-
-			// Explicitly handle marketing_optin checkbox for first traveler
-			// (unchecked checkboxes don't submit, so we need to set to false explicitly)
-			if ( $is_first_index ) {
-				$new_travelers[ $index ]['marketing_optin'] = isset( $application_data['marketing_optin'] ) && $application_data['marketing_optin'] == '1';
-				$is_first_index = false;
-			}
-		}
-
-		// Replace travelers array with the new one (removes deleted travelers)
-		$visa_data['travelers'] = $new_travelers;
-
-		// Update applicants count to match actual number of travelers
-		$visa_data['applicants'] = count( $new_travelers );
-
-		// Save updated data back to session.
-		$request->session()->put( 'visa_application', $visa_data );
+		// Update application with travelers info
+		$this->visaService->updateApplication( $application->id, [
+			'travelers' => $submitted_travelers,
+		], 'application-details' );
 
 		// Handle Ajax requests.
 		if ( $request->ajax() || $request->wantsJson() ) {
@@ -359,17 +362,20 @@ class SiteController extends Controller {
 			abort( 404 );
 		}
 
-		// Get visa application data from session.
-		$visa_data = $request->session()->get( 'visa_application', [] );
-		$travelers = $visa_data['travelers'] ?? null;
+		// Find or create draft application.
+		$user = auth()->user();
+		$application = $this->visaService->findOrCreateDraft( $country_code, $user );
 
-		// If no travelers in session, redirect to application details page.
-		if ( ! $travelers ) {
+		// If no travelers, redirect to application details page.
+		if ( ! $application->number_of_travelers ) {
 			return redirect()->route( 'application.details', [ 'country' => $country ] );
 		}
 
-		$applicants_count = count( $travelers );
-		$nationality = $visa_data['nationality'] ?? null;
+		// Load existing travelers from database.
+		$existing_travelers = $application->travelers->keyBy( 'traveler_index' )->toArray();
+
+		$applicants_count = $application->number_of_travelers;
+		$nationality = $application->nationality_country_code ? strtolower( $application->nationality_country_code ) : null;
 
 		// Pricing and currency conversion.
 		$base_price_usd = 49; // Base price per traveler in USD.
@@ -382,16 +388,25 @@ class SiteController extends Controller {
 			'country_name' => Countries::getCountryName( $country_code ),
 			'country_code' => $country_code,
 			'country_slug' => $country,
-			'travelers' => $travelers,
+			'travelers' => $existing_travelers,
 			'applicants_count' => $applicants_count,
 			'nationality' => $nationality,
 			'price_per_traveler' => $price_per_traveler,
 			'currency_symbol' => $currency_symbol,
 			'currency_config' => $currency_config,
+			'application' => $application,
 		] );
 	}
 
 	public function postPassportDetails( Request $request, $country ) {
+		// Slug to country code mapping.
+		$slug_to_code = array_flip( Countries::getCountrySlugs() );
+		$country_code = $slug_to_code[ $country ] ?? null;
+
+		if ( ! $country_code ) {
+			abort( 404 );
+		}
+
 		// Get actual submitted travelers.
 		$submitted_travelers = $request->input( 'travelers', [] );
 
@@ -432,35 +447,40 @@ class SiteController extends Controller {
 		// Validate inputs.
 		$request->validate( $rules, [], $attributes );
 
-		// Get existing visa application data from session.
-		$visa_data = $request->session()->get( 'visa_application', [] );
+		// Find draft application.
+		$user = auth()->user();
+		$application = $this->visaService->findOrCreateDraft( $country_code, $user );
+
+		// Load existing travelers from database.
+		$existing_travelers = $application->travelers->keyBy( 'traveler_index' )->toArray();
 
 		// Merge passport data with existing traveler data.
-		if ( isset( $visa_data['travelers'] ) ) {
-			foreach ( $submitted_travelers as $index => $passport_data ) {
-				if ( isset( $visa_data['travelers'][ $index ] ) ) {
-					// Explicitly handle the add_passport_later checkbox
-					// If checkbox is not present in form data, it means it's unchecked
-					$passport_data['add_passport_later'] = isset( $passport_data['add_passport_later'] ) && $passport_data['add_passport_later'] == '1';
+		$merged_travelers = [];
+		foreach ( $submitted_travelers as $index => $passport_data ) {
+			// Start with existing traveler data.
+			$traveler_data = $existing_travelers[ $index ] ?? [];
 
-					// If passport is being added later, clear any existing passport data
-					if ( $passport_data['add_passport_later'] ) {
-						$passport_data['passport_number'] = null;
-						$passport_data['passport_expiration_month'] = null;
-						$passport_data['passport_expiration_day'] = null;
-						$passport_data['passport_expiration_year'] = null;
-					}
+			// Explicitly handle the add_passport_later checkbox.
+			// If checkbox is not present in form data, it means it's unchecked.
+			$passport_data['add_passport_later'] = isset( $passport_data['add_passport_later'] ) && $passport_data['add_passport_later'] == '1';
 
-					$visa_data['travelers'][ $index ] = array_merge(
-						$visa_data['travelers'][ $index ],
-						$passport_data
-					);
-				}
+			// If passport is being added later, clear any existing passport data.
+			if ( $passport_data['add_passport_later'] ) {
+				$passport_data['passport_number'] = null;
+				$passport_data['passport_expiration_month'] = null;
+				$passport_data['passport_expiration_day'] = null;
+				$passport_data['passport_expiration_year'] = null;
 			}
+
+			// Merge passport data into existing traveler data.
+			$merged_travelers[ $index ] = array_merge( $traveler_data, $passport_data );
 		}
 
-		// Save updated data back to session.
-		$request->session()->put( 'visa_application', $visa_data );
+		// Save travelers to database.
+		$this->visaService->saveTravelers( $application->id, $merged_travelers );
+
+		// Update application.
+		$this->visaService->updateApplication( $application->id, [], 'passport-details' );
 
 		// Handle Ajax requests.
 		if ( $request->ajax() || $request->wantsJson() ) {
@@ -486,24 +506,30 @@ class SiteController extends Controller {
 			abort( 404 );
 		}
 
-		// Get visa application data from session.
-		$visa_data = $request->session()->get( 'visa_application', [] );
-		$travelers = $visa_data['travelers'] ?? null;
+		// Find or create draft application.
+		$user = auth()->user();
+		$application = $this->visaService->findOrCreateDraft( $country_code, $user );
 
-		// If no travelers in session, redirect to passport details page.
-		if ( ! $travelers ) {
+		// If no travelers, redirect to passport details page.
+		if ( ! $application->number_of_travelers ) {
 			return redirect()->route( 'passport.details', [ 'country' => $country ] );
 		}
 
-		$applicants_count = count( $travelers );
+		$applicants_count = $application->number_of_travelers;
 
-		// Get pricing configuration.
-		$pricing_config = config( 'pricing.colombia' );
+		// Get pricing configuration for this country (use slug, not code).
+		$pricing_config = config( "pricing.{$country}" );
+
+		// Fallback to Colombia pricing if country not configured.
+		if ( ! $pricing_config ) {
+			$pricing_config = config( 'pricing.colombia' );
+		}
+
 		$base_price_usd = $pricing_config['base_form_price_usd'];
 		$processing_options = $pricing_config['processing_options'];
 
-		// Get selected processing option from session (default to standard).
-		$selected_processing = $visa_data['processing_option'] ?? 'standard';
+		// Get selected processing option from application (default to standard).
+		$selected_processing = $application->processing_option ?? 'standard';
 
 		// Currency conversion.
 		$user_currency = $request->cookie( 'preferred_currency', 'USD' );
@@ -529,10 +555,19 @@ class SiteController extends Controller {
 			'currency_config' => $currency_config,
 			'processing_options' => $processing_options,
 			'selected_processing' => $selected_processing,
+			'application' => $application,
 		] );
 	}
 
 	public function updateProcessingTime( Request $request, $country ) {
+		// Slug to country code mapping.
+		$slug_to_code = array_flip( Countries::getCountrySlugs() );
+		$country_code = $slug_to_code[ $country ] ?? null;
+
+		if ( ! $country_code ) {
+			abort( 404 );
+		}
+
 		// Validate processing option.
 		$request->validate( [
 			'processing_option' => 'required|string|in:standard,rush',
@@ -540,16 +575,21 @@ class SiteController extends Controller {
 
 		$processing_option = $request->input( 'processing_option' );
 
-		// Update session.
-		$request->session()->put( 'visa_application.processing_option', $processing_option );
+		// Find draft application.
+		$user = auth()->user();
+		$application = $this->visaService->findOrCreateDraft( $country_code, $user );
 
-		// Get pricing configuration.
-		$pricing_config = config( 'pricing.colombia' );
-		$selected_option = $pricing_config['processing_options'][ $processing_option ];
+		// Update application and recalculate pricing.
+		$this->visaService->updateApplication( $application->id, [
+			'processing_option' => $processing_option,
+		], 'processing-time' );
 
-		// Get user currency and convert prices.
+		// Reload application to get updated pricing.
+		$application->refresh();
+
+		// Get user currency and convert processing fee.
 		$user_currency = $request->cookie( 'preferred_currency', 'USD' );
-		$processing_fee = Currencies::convertFromUSD( $selected_option['price_usd'], $user_currency );
+		$processing_fee = Currencies::convertFromUSD( $application->processing_fee_usd, $user_currency );
 
 		// Return success with updated pricing.
 		return response()->json( [
@@ -559,6 +599,14 @@ class SiteController extends Controller {
 	}
 
 	public function postProcessingTime( Request $request, $country ) {
+		// Slug to country code mapping.
+		$slug_to_code = array_flip( Countries::getCountrySlugs() );
+		$country_code = $slug_to_code[ $country ] ?? null;
+
+		if ( ! $country_code ) {
+			abort( 404 );
+		}
+
 		// Validate processing option.
 		$request->validate( [
 			'processing_option' => 'required|string|in:standard,rush',
@@ -566,8 +614,14 @@ class SiteController extends Controller {
 
 		$processing_option = $request->input( 'processing_option' );
 
-		// Update session.
-		$request->session()->put( 'visa_application.processing_option', $processing_option );
+		// Find draft application.
+		$user = auth()->user();
+		$application = $this->visaService->findOrCreateDraft( $country_code, $user );
+
+		// Update application and recalculate pricing.
+		$this->visaService->updateApplication( $application->id, [
+			'processing_option' => $processing_option,
+		], 'processing-time' );
 
 		// Handle Ajax requests.
 		if ( $request->ajax() || $request->wantsJson() ) {
@@ -593,38 +647,49 @@ class SiteController extends Controller {
 			abort( 404 );
 		}
 
-		// Get visa application data from session.
-		$visa_data = $request->session()->get( 'visa_application', [] );
-		$travelers = $visa_data['travelers'] ?? null;
-		$processing_option = $visa_data['processing_option'] ?? null;
+		// Find or create draft application.
+		$user = auth()->user();
+		$application = $this->visaService->findOrCreateDraft( $country_code, $user );
 
-		// If no travelers or processing option in session, redirect to previous step.
-		if ( ! $travelers || ! $processing_option ) {
+		// If no travelers or processing option, redirect to previous step.
+		if ( ! $application->number_of_travelers || ! $application->processing_option ) {
 			return redirect()->route( 'processing.time', [ 'country' => $country ] );
 		}
 
-		$applicants_count = count( $travelers );
+		// Load travelers from database.
+		$travelers = $application->travelers->keyBy( 'traveler_index' )->toArray();
+		$applicants_count = $application->number_of_travelers;
 
-		// Get pricing configuration.
-		$pricing_config = config( 'pricing.colombia' );
+		// Get pricing configuration for this country (use slug, not code).
+		$pricing_config = config( "pricing.{$country}" );
+
+		// Fallback to Colombia pricing if country not configured.
+		if ( ! $pricing_config ) {
+			$pricing_config = config( 'pricing.colombia' );
+		}
+
 		$base_price_usd = $pricing_config['base_form_price_usd'];
 		$processing_options = $pricing_config['processing_options'];
 		$visa_details = $pricing_config['visa_details'];
 		$denial_protection = $pricing_config['denial_protection'];
 
 		// Get selected processing option details.
+		$processing_option = $application->processing_option;
 		$selected_option = $processing_options[ $processing_option ];
 
-		// Get denial protection status from session (default to false).
-		$has_denial_protection = $visa_data['denial_protection'] ?? false;
+		// Get denial protection status from application.
+		$has_denial_protection = $application->has_denial_protection ?? false;
 
 		// Currency conversion.
 		$user_currency = $request->cookie( 'preferred_currency', 'USD' );
 		$price_per_traveler = Currencies::convertFromUSD( $base_price_usd, $user_currency );
 		$currency_symbol = Currencies::getSymbol( $user_currency );
 		$currency_config = Currencies::getCurrencyConfig( $user_currency );
-		$processing_fee = Currencies::convertFromUSD( $selected_option['price_usd'], $user_currency );
+		$processing_fee = Currencies::convertFromUSD( $application->processing_fee_usd, $user_currency );
 		$denial_protection_price = Currencies::convertFromUSD( $denial_protection['price_usd'], $user_currency );
+
+		// Get total price from application (already calculated).
+		$total_price = Currencies::convertFromUSD( $application->total_amount_usd, $user_currency );
 
 		// Calculate arrival date (today + processing days).
 		$processing_days = $selected_option['days'];
@@ -648,35 +713,20 @@ class SiteController extends Controller {
 			'denial_protection' => $denial_protection,
 			'denial_protection_price' => $denial_protection_price,
 			'has_denial_protection' => $has_denial_protection,
+			'total_price' => $total_price,
+			'application' => $application,
 		] );
-	}
-
-	public function postReview( Request $request, $country ) {
-		// Validate denial protection choice.
-		$request->validate( [
-			'denial_protection' => 'nullable|boolean',
-		] );
-
-		$has_denial_protection = $request->input( 'denial_protection', false );
-
-		// Update session.
-		$request->session()->put( 'visa_application.denial_protection', $has_denial_protection );
-
-		// Handle Ajax requests.
-		if ( $request->ajax() || $request->wantsJson() ) {
-			return response()->json( [
-				'success' => true,
-				'message' => __( 'Order reviewed!' ),
-				'redirect' => route( 'review', [ 'country' => $country ] ) // TODO: Update to payment route
-			] );
-		}
-
-		// TODO: Redirect to payment page.
-		// For now, redirect back with success message.
-		return redirect()->back()->with( 'success', __( 'Order reviewed!' ) );
 	}
 
 	public function updateDenialProtection( Request $request, $country ) {
+		// Slug to country code mapping.
+		$slug_to_code = array_flip( Countries::getCountrySlugs() );
+		$country_code = $slug_to_code[ $country ] ?? null;
+
+		if ( ! $country_code ) {
+			abort( 404 );
+		}
+
 		// Validate denial protection choice.
 		$request->validate( [
 			'denial_protection' => 'required|boolean',
@@ -684,13 +734,151 @@ class SiteController extends Controller {
 
 		$has_denial_protection = $request->input( 'denial_protection' );
 
-		// Update session.
-		$request->session()->put( 'visa_application.denial_protection', $has_denial_protection );
+		// Find draft application.
+		$user = auth()->user();
+		$application = $this->visaService->findOrCreateDraft( $country_code, $user );
 
-		// Return success response.
+		// Update application and recalculate pricing.
+		$this->visaService->updateApplication( $application->id, [
+			'denial_protection' => $has_denial_protection,
+		], 'review' );
+
+		// Reload application to get updated pricing.
+		$application->refresh();
+
+		// Get user currency and convert total.
+		$user_currency = $request->cookie( 'preferred_currency', 'USD' );
+		$total_price = Currencies::convertFromUSD( $application->total_amount_usd, $user_currency );
+
+		// Return success response with updated pricing.
 		return response()->json( [
 			'success' => true,
 			'has_denial_protection' => $has_denial_protection,
+			'total_price' => $total_price,
+		] );
+	}
+
+	public function createPaymentIntent( Request $request, $country ) {
+		try {
+			// Slug to country code mapping.
+			$slug_to_code = array_flip( Countries::getCountrySlugs() );
+			$country_code = $slug_to_code[ $country ] ?? null;
+
+			if ( ! $country_code ) {
+				return response()->json( [
+					'success' => false,
+					'message' => __( 'Invalid country.' ),
+				], 404 );
+			}
+
+			// Find draft application.
+			$user = auth()->user();
+			$application = $this->visaService->findOrCreateDraft( $country_code, $user );
+
+			// Ensure application is complete.
+			if ( ! $application->number_of_travelers || ! $application->processing_option ) {
+				return response()->json( [
+					'success' => false,
+					'message' => __( 'Please complete all steps before payment.' ),
+				], 400 );
+			}
+
+			// Create payment intent via service.
+			$payment_data = $this->visaService->createPaymentIntent( $application->id );
+
+			// Return client secret and publishable key.
+			return response()->json( [
+				'success' => true,
+				'client_secret' => $payment_data['client_secret'],
+				'public_key' => $payment_data['public_key'],
+			] );
+		} catch ( \Exception $e ) {
+			\Log::error( 'Payment intent creation failed', [
+				'error' => $e->getMessage(),
+				'trace' => $e->getTraceAsString(),
+			] );
+
+			return response()->json( [
+				'success' => false,
+				'message' => __( 'Failed to create payment. Please try again.' ),
+				'error' => config( 'app.debug' ) ? $e->getMessage() : null,
+			], 500 );
+		}
+	}
+
+	public function paymentSuccess( Request $request, $country ) {
+		// Slug to country code mapping.
+		$slug_to_code = array_flip( Countries::getCountrySlugs() );
+		$country_code = $slug_to_code[ $country ] ?? null;
+
+		if ( ! $country_code ) {
+			abort( 404 );
+		}
+
+		// Get payment intent ID from query string.
+		$payment_intent_id = $request->query( 'payment_intent' );
+
+		if ( ! $payment_intent_id ) {
+			return redirect()->route( 'apply', [ 'country' => $country ] )
+				->with( 'error', __( 'Invalid payment session.' ) );
+		}
+
+		// Find application by payment intent ID.
+		$application = \App\Models\VisaApplication::where( 'stripe_payment_intent_id', $payment_intent_id )
+			->first();
+
+		if ( ! $application ) {
+			return redirect()->route( 'apply', [ 'country' => $country ] )
+				->with( 'error', __( 'Payment session not found.' ) );
+		}
+
+		// Verify payment with Stripe.
+		$stripe_secret = config( 'cashier.secret' );
+		\Stripe\Stripe::setApiKey( $stripe_secret );
+
+		try {
+			$payment_intent = \Stripe\PaymentIntent::retrieve( $payment_intent_id );
+
+			// Check if payment was successful.
+			if ( $payment_intent->status === 'succeeded' ) {
+				// Update application status to paid.
+				$application->status = 'paid';
+				$application->paid_at = now();
+				$application->save();
+			} else {
+				// Payment not successful.
+				return redirect()->route( 'apply', [ 'country' => $country ] )
+					->with( 'error', __( 'Payment was not successful. Please try again.' ) );
+			}
+		} catch ( \Exception $e ) {
+			return redirect()->route( 'apply', [ 'country' => $country ] )
+				->with( 'error', __( 'Error verifying payment. Please contact support.' ) );
+		}
+
+		// Load travelers for display.
+		$application->load( 'travelers' );
+
+		// Get pricing configuration (use slug, not code).
+		$pricing_config = config( "pricing.{$country}" );
+		if ( ! $pricing_config ) {
+			$pricing_config = config( 'pricing.colombia' );
+		}
+
+		// Currency conversion for display.
+		$user_currency = $request->cookie( 'preferred_currency', 'USD' );
+		$currency_symbol = Currencies::getSymbol( $user_currency );
+		$currency_config = Currencies::getCurrencyConfig( $user_currency );
+		$total_amount = Currencies::convertFromUSD( $application->total_amount_usd, $user_currency );
+
+		return view( 'pages.payment-success', [
+			'country_name' => Countries::getCountryName( $country_code ),
+			'country_code' => $country_code,
+			'country_slug' => $country,
+			'application' => $application,
+			'currency_symbol' => $currency_symbol,
+			'currency_config' => $currency_config,
+			'total_amount' => $total_amount,
+			'pricing_config' => $pricing_config,
 		] );
 	}
 }

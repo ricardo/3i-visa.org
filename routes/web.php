@@ -5,8 +5,12 @@ use Illuminate\Support\Facades\Request;
 
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\StripeWebhookController;
 
 use Livewire\Livewire;
+
+// Stripe webhook (outside locale group, no CSRF protection needed)
+Route::post( 'stripe/webhook', [ StripeWebhookController::class, 'handleWebhook' ] )->name( 'stripe.webhook' );
 
 $locale = Request::segment( 1 );
 
@@ -57,8 +61,11 @@ Route::group( [
 
 	// Review page.
 	Route::get( '{country}/review', [ SiteController::class, 'getReview' ] )->name( 'review' );
-	Route::post( '{country}/review', [ SiteController::class, 'postReview' ] )->name( 'review.submit' );
 	Route::post( '{country}/review/update-denial-protection', [ SiteController::class, 'updateDenialProtection' ] )->name( 'review.update.denial' );
+
+	// Payment routes.
+	Route::post( '{country}/payment/create-intent', [ SiteController::class, 'createPaymentIntent' ] )->name( 'payment.intent' );
+	Route::get( '{country}/payment/success', [ SiteController::class, 'paymentSuccess' ] )->name( 'payment.success' );
 
 	// Auth:Login.
 	Route::post( 'login', [ AuthController::class, 'postLogin' ] )->name( 'login.post' );

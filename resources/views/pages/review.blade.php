@@ -74,6 +74,8 @@
 
 							if (response.data.success) {
 								console.log('Denial protection updated:', response.data.has_denial_protection);
+								// Note: The reactive totalPrice calculation will update automatically
+								// based on hasDenialProtection state
 							}
 						} catch (error) {
 							console.error('Failed to update denial protection:', error);
@@ -113,30 +115,16 @@
 
 						if (this.isSubmitting) return;
 
-						this.isSubmitting = true;
+						// Open the Stripe payment dialog using the global dialog system
+						window.openDialog('#dialog-stripe-payment', '#stripe-payment');
 
-						const formData = new FormData(event.target);
-
-						try {
-							const response = await axios.post(
-								event.target.action,
-								formData,
-								{
-									headers: {
-										'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
-										'Accept': 'application/json'
-									}
-								}
-							);
-
-							if (response.data.success) {
-								window.location.href = response.data.redirect;
+						// Initialize Stripe after dialog opens
+						setTimeout(() => {
+							const paymentComponent = Alpine.$data(document.querySelector('#dialog-stripe-payment [x-data]'));
+							if (paymentComponent && paymentComponent.initStripe) {
+								paymentComponent.initStripe();
 							}
-						} catch (error) {
-							console.error('Failed to submit form:', error);
-						} finally {
-							this.isSubmitting = false;
-						}
+						}, 100);
 					}
 				}));
 			});
@@ -146,7 +134,7 @@
 			<div class="application-details-content">
 				<form
 					id="review-form"
-					action="{{ route( 'review.submit', [ 'country' => $country_slug ] ) }}"
+					action="#"
 					method="POST"
 					x-on:submit.prevent="submitForm($event)"
 				>
@@ -312,4 +300,13 @@
 			</div>
 		</div>
 	</main>
+
+	<!-- Stripe Payment Dialog -->
+	@include( 'dialogs.stripe-payment', [
+		'country_slug' => $country_slug,
+		'total_price' => $total_price,
+		'currency_code' => $application->currency_code,
+		'currency_symbol' => $currency_symbol,
+		'currency_config' => $currency_config
+	] )
 @endsection
