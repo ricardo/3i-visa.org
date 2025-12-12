@@ -32,11 +32,6 @@
 					@include( 'icons.globe' )
 				</a>
 
-				<!-- <a href="{{ route( 'account' ) }}" role="button" class="white header-button user-button">
-					@include( 'icons.user' )
-					<span>{{ Str::limit(auth()->user()->first_name, 15, '') }}</span>
-				</a> -->
-
 				<details class="dropdown button-dropdown">
 					<summary role="button" class="white header-button user-button">
 						@include( 'icons.user' )
@@ -44,7 +39,7 @@
 					</summary>
 					<ul class="top right">
 						<li>
-							<a href="{{ route( 'account' ) }}" class="contrast">
+							<a href="{{ route( 'orders' ) }}" class="contrast">
 								@lang( 'My Orders' )
 							</a>
 						</li>
@@ -102,9 +97,6 @@
 					<a href="javascript: void(0);" role="button" class="mobile-menu-item" onClick="window.openDialog( '#dialog-language-switcher', '#language-switcher' );">
 						{{ $current_currency }} /
 						@include( 'icons.globe' )
-					</a>
-					<a href="{{ route( 'logout' ) }}" class="mobile-menu-item">
-						@lang( 'Logout' )
 					</a>
 				</nav>
 			</div>

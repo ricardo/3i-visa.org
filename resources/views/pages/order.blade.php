@@ -2,16 +2,28 @@
 @section( 'title', __( 'Payment Successful' ) . ' • 3i Visa' )
 @section( 'content' )
 	<main class="container">
-		<div class="payment-success-page">
-			<div class="payment-success-content">
+		<div class="order-page">
+			<div class="order-content">
 				<!-- Success Hero -->
 				<div class="success-hero text-center mt-6 mb-7">
+					@php
+						// Determine current step title based on application status
+						$step_title = match($application->status) {
+							'paid' => __('Information Under Review'),
+							'processing' => __('Information Under Review'),
+							'approved' => __('Check-MIG Form Ready'),
+							'completed' => __('Check-MIG Form Ready'),
+							default => __('Payment Successful'),
+						};
+					@endphp
 
-					<h1 class="mb-6">
-						@lang( 'Payment Successful' )
+					<h1 class="mb-2">
+						{{ $step_title }}
 					</h1>
 
-					<!-- <p class="lead">@lang( 'Thank you for your order' )</p> -->
+					<p class="lead" style="color: var(--3i-muted-color); margin-bottom: 2rem;">
+						@lang( 'Order Number' ): {{ $application->order_number }}
+					</p>
 
 					@auth
 						@if ( $is_new_payment )
@@ -142,7 +154,7 @@
 						@if($application->expected_completion_date)
 							<div class="info-row">
 								<span class="info-label">@lang( 'Expected Completion' ):</span>
-								<span class="info-value">{{ $application->expected_completion_date->format('M d, Y') }}</span>
+								<span class="info-value">{{ $application->expected_completion_date->locale(app()->getLocale())->isoFormat('ll') }}</span>
 							</div>
 						@endif
 					</div>

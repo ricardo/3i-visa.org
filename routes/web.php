@@ -65,7 +65,9 @@ Route::group( [
 
 	// Payment routes.
 	Route::post( '{country}/payment/create-intent', [ SiteController::class, 'createPaymentIntent' ] )->name( 'payment.intent' );
-	Route::get( 'payment/success', [ SiteController::class, 'paymentSuccess' ] )->name( 'payment.success' );
+
+	// Order routes.
+	Route::get( 'order/{order_number?}', [ SiteController::class, 'viewOrder' ] )->name( 'order' );
 
 	// Auth:Login.
 	Route::get( 'login', [ AuthController::class, 'getLogin' ] )->name( 'login' );
@@ -84,8 +86,8 @@ Route::group( [
 	// Auth:Logout.
 	Route::get( 'logout', [ AuthController::class, 'logout' ] )->name( 'logout' );
 
-	// Auth:Account.
-	Route::get( 'account', [ SiteController::class, 'getAccount' ] )->name( 'account' )->middleware( 'auth' );
+	// Orders.
+	Route::get( 'orders', [ SiteController::class, 'getOrders' ] )->name( 'orders' )->middleware( 'auth' );
 
 	Livewire::setUpdateRoute( function ( $handle ) {
         return Route::post( 'livewire/update', $handle );

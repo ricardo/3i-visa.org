@@ -91,7 +91,7 @@ class AuthController extends Controller {
 			// Authentication successful
 			$request->session()->regenerate();
 
-			return redirect()->intended( route( 'account' ) );
+			return redirect()->intended( route( 'orders' ) );
 		}
 
 		// Authentication failed
@@ -201,7 +201,7 @@ class AuthController extends Controller {
 		);
 
 		if ( $status === \Illuminate\Support\Facades\Password::PASSWORD_RESET ) {
-			return redirect()->route( 'account' )->with( 'success', __( 'Password has been set. You are now logged in!' ) );
+			return redirect()->route( 'orders' )->with( 'success', __( 'Password has been set. You are now logged in!' ) );
 		}
 
 		return redirect()->back()

@@ -61,7 +61,10 @@
 									<p style="font-size: 0.875rem; color: var(--3i-muted-color); margin: 0 0 0.25rem 0;">
 										@lang( 'Destination' )
 									</p>
-									<p style="font-weight: 600; margin: 0;">
+									<p style="font-weight: 600; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+										@if($application->destination_country_code)
+											<span class="fi fi-{{ strtolower($application->destination_country_code) }}" style="font-size: 1.25rem;"></span>
+										@endif
 										{{ $country_name }}
 									</p>
 								</div>
@@ -80,13 +83,13 @@
 										@lang( 'Date' )
 									</p>
 									<p style="font-weight: 600; margin: 0;">
-										{{ $application->created_at->format('M d, Y') }}
+										{{ $application->created_at->locale(app()->getLocale())->isoFormat('ll') }}
 									</p>
 								</div>
 							</div>
 
 							<div style="border-top: 1px solid var(--3i-border-color); padding-top: 1rem;">
-								<a href="{{ route('payment.success', ['order_number' => $application->order_number]) }}"
+								<a href="{{ route('order', ['order_number' => $application->order_number]) }}"
 									role="button"
 									class="contrast"
 									style="display: inline-block; text-decoration: none; font-size: 0.9375rem;">

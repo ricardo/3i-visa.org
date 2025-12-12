@@ -63,7 +63,7 @@
 		<div style="max-height: 240px; overflow-y: auto;">
 			<template x-for="order in filteredOrders" x-bind:key="order.id">
 				<a
-					x-bind:href="'{{ route('payment.success') }}?order_number=' + order.order_number"
+					x-bind:href="'{{ url('order') }}/' + order.order_number"
 					class="order-selector-item"
 					x-bind:class="{ 'active': order.id === {{ $current_application_id }} }"
 					style="display: block; padding: 12px 16px; text-decoration: none; color: inherit; border-bottom: 1px solid #eee; transition: background 0.2s;"

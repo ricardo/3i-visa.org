@@ -814,14 +814,11 @@ class SiteController extends Controller {
 		}
 	}
 
-	public function paymentSuccess( Request $request ) {
-		// Get payment intent ID from query string.
+	public function viewOrder( Request $request, $order_number = null ) {
+		// Get payment intent ID from query string (for Stripe redirects)
 		$payment_intent_id = $request->query( 'payment_intent' );
 
-		// Get optional order number from query string (for viewing specific orders)
-		$requested_order_number = $request->query( 'order_number' );
-
-		if ( ! $payment_intent_id && ! $requested_order_number ) {
+		if ( ! $payment_intent_id && ! $order_number ) {
 			return redirect()->route( 'home' )
 				->with( 'error', __( 'Invalid payment session.' ) );
 		}
@@ -830,13 +827,13 @@ class SiteController extends Controller {
 		if ( $payment_intent_id ) {
 			$application = \App\Models\VisaApplication::where( 'stripe_payment_intent_id', $payment_intent_id )
 				->first();
-		} elseif ( $requested_order_number ) {
-			// When viewing a specific order, must be authenticated
+		} elseif ( $order_number ) {
+			// When viewing a specific order by order number, must be authenticated
 			if ( ! auth()->check() ) {
 				return redirect()->route( 'login' )
 					->with( 'error', __( 'Please log in to view your orders.' ) );
 			}
-			$application = \App\Models\VisaApplication::where( 'order_number', $requested_order_number )
+			$application = \App\Models\VisaApplication::where( 'order_number', $order_number )
 				->where( 'user_id', auth()->id() )
 				->first();
 		}
@@ -902,7 +899,7 @@ class SiteController extends Controller {
 		$currency_config = Currencies::getCurrencyConfig( $user_currency );
 		$total_amount = Currencies::convertFromUSD( $application->total_amount_usd, $user_currency );
 
-		return view( 'pages.payment-success', [
+		return view( 'pages.order', [
 			'country_name' => Countries::getCountryName( $country_code ),
 			'country_code' => $country_code,
 			'country_slug' => $country_slug,
@@ -994,12 +991,12 @@ class SiteController extends Controller {
 	}
 
 	/**
-	 * Show user account page with all orders.
+	 * Show user orders page with all orders.
 	 *
 	 * @param \Illuminate\Http\Request $request
 	 * @return \Illuminate\View\View
 	 */
-	public function getAccount( Request $request ) {
+	public function getOrders( Request $request ) {
 		$user = auth()->user();
 
 		// Get all visa applications for this user, excluding drafts, ordered by most recent first
@@ -1008,7 +1005,7 @@ class SiteController extends Controller {
 			->orderBy( 'created_at', 'desc' )
 			->get();
 
-		return view( 'pages.account', [
+		return view( 'pages.orders', [
 			'user' => $user,
 			'applications' => $applications,
 		] );
