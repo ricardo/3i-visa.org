@@ -190,18 +190,3 @@ body > header {
 		background-color: transparent;
 	}
 }
-
-.user-avatar {
-	display: block;
-	width: 35px !important;
-	height: 35px !important;
-	border-radius: 50%;
-	padding: 0;
-	cursor: pointer;
-
-	@include respond-to( md ) {
-		width: 32px;
-		height: 32px;
-	}
-}
-

@@ -176,5 +176,6 @@
     "Password reset link sent to your email.": "Link de redefinição de senha enviado para seu e-mail.",
     "Logout": "Sair",
     "Payment Successful": "Pagamento Bem-Sucedido",
-    "Your approved :country Check-MIG Form will be sent to this email address once processed.": "Seu formulário Check-MIG para :country aprovado será enviado para este endereço de e-mail assim que processado."
+    "Your approved :country Check-MIG Form will be sent to this email address once processed.": "Seu formulário Check-MIG para :country aprovado será enviado para este endereço de e-mail assim que processado.",
+    "Refund Policy": "Política de Reembolso"
 }

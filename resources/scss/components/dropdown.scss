@@ -1,0 +1,144 @@
+@use "@picocss/pico/scss/colors" as *;
+@use "../mixins" as *;
+
+// TODO: Need to fix this as it's not working properly for some reason.
+// Sometimes only works the first time, sometimes 3 times.
+@keyframes fadeInTop {
+	from {
+		opacity: 0;
+		translate: 0 -20px;
+	}
+	to {
+		opacity: 1;
+		translate: 0 0;
+	}
+}
+
+details.dropdown summary + ul {
+	animation: none !important;
+}
+
+details.dropdown[open] summary + ul {
+	animation: fadeInTop .3s forwards !important;
+}
+
+details.dropdown {
+	summary {
+		&::before {
+			display: none !important;
+			content: none !important;
+		}
+	}
+
+	summary + ul {
+		background-color: white !important;
+		backdrop-filter: blur( .5rem ) !important;
+		padding: 3px 6px !important;
+		border: 1px solid var( --3i-border-color );
+
+		li {
+			padding: 0 0 2px 0 !important;
+
+			&:last-child {
+				padding-bottom: 0 !important;
+			}
+
+			a {
+				display: flex !important;
+				align-items: center;
+				justify-content: flex-start;
+				font-size: 1.05rem;
+				color: var( --3i-color );
+				padding: .5rem 1rem .5rem .7rem !important;
+				border-radius: var( --3i-border-radius ) !important;
+				margin: 0 !important;
+				width: 100%;
+				box-sizing: border-box;
+				border: 1px solid transparent;
+
+				@include no-select;
+
+				&:hover, &:focus {
+					background-color: #F8F9FA !important;
+				}
+
+				svg {
+					width: 1rem;
+					height: 1rem;
+					margin-right: .7rem;
+				}
+			}
+		}
+	}
+
+	ul {
+		&.center {
+			left: 50%;
+			transform: translateX( -50% ) !important;
+		}
+
+		&.right {
+			left: auto;
+			right: 0;
+		}
+
+		&.top {
+			bottom: auto;
+			top: 100%;
+		}
+
+		&.bottom {
+			top: auto;
+			bottom: 100%;
+		}
+
+		li a {
+			padding: calc( var( --3i-form-element-spacing-vertical ) * .75 ) var( --3i-form-element-spacing-horizontal ) !important;
+		}
+	}
+}
+
+details.button-dropdown {
+	// display: flex;
+	// align-items: center;
+	// justify-content: center;
+	margin-bottom: 0;
+	// padding: 0;
+	// background: none;
+	// border: 0;
+	// box-sizing: border-box;
+
+	summary {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		// width: 100%;
+		// height: 100%;
+		background: none;
+		text-align: center;
+		// border-radius: 50%;
+		// padding: 0;
+		box-shadow: none !important;
+		color: white;
+		border: 1px solid transparent;
+		transition: var( --3i-transition ) !important;
+		box-sizing: border-box;
+
+		// &:active, &:focus-within {
+		// 	border-color: rgba( 255, 255, 255, .2 ) !important;
+		// }
+
+		&::after {
+			display: none;
+		}
+	}
+
+	&:hover {
+		background: rgba( 255, 255, 255, 0.1 );
+	}
+
+	svg {
+		width: 1.17rem;
+		height: 1.17rem;
+	}
+}

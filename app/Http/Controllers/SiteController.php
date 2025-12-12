@@ -29,7 +29,15 @@ class SiteController extends Controller {
 	}
 
 	public function getRefundPolicy() {
-		return view( 'pages.refund-policy' );
+		$locale = app()->getLocale();
+		$view = "pages.refund-policy-{$locale}";
+
+		// Fallback to English if locale-specific file doesn't exist
+		if ( ! view()->exists( $view ) ) {
+			$view = 'pages.refund-policy-en';
+		}
+
+		return view( $view );
 	}
 
 	public function postSwitchLanguage( Request $request ) {

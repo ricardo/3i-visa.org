@@ -32,10 +32,29 @@
 					@include( 'icons.globe' )
 				</a>
 
-				<a href="{{ route( 'account' ) }}" role="button" class="white header-button user-button">
+				<!-- <a href="{{ route( 'account' ) }}" role="button" class="white header-button user-button">
 					@include( 'icons.user' )
 					<span>{{ Str::limit(auth()->user()->first_name, 15, '') }}</span>
-				</a>
+				</a> -->
+
+				<details class="dropdown button-dropdown">
+					<summary role="button" class="white header-button user-button">
+						@include( 'icons.user' )
+						<span>{{ Str::limit(auth()->user()->first_name, 15, '') }}</span>
+					</summary>
+					<ul class="top right">
+						<li>
+							<a href="{{ route( 'account' ) }}" class="contrast">
+								@lang( 'My Orders' )
+							</a>
+						</li>
+						<li>
+							<a href="{{ route( 'logout' ) }}" class="contrast">
+								@lang( 'Logout' )
+							</a>
+						</li>
+					</ul>
+				</details>
 
 				<button id="menu-toggle" class="nav-toggle display-mobile-only" aria-label="Open menu">
 					<span></span>

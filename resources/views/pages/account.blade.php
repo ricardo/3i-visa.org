@@ -1,19 +1,9 @@
 @extends( 'layouts/main' )
-@section( 'title', __( 'My Account' ) . ' • 3i Visa' )
+@section( 'title', __( 'My Orders' ) . ' • 3i Visa' )
 @section( 'content' )
 	<main class="container">
 		<div class="account-page" style="max-width: 1000px; margin: 80px auto; padding: 1rem;">
-			<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-				<div>
-					<h1 style="margin-bottom: 0.5rem;">@lang( 'My Account' )</h1>
-					<p style="color: var(--3i-muted-color); margin: 0;">{{ $user->first_name }} {{ $user->last_name }}</p>
-				</div>
-				<a href="{{ route('logout') }}" class="secondary" style="text-decoration: none;">
-					@lang( 'Logout' )
-				</a>
-			</div>
-
-			<h2 style="font-size: 1.5rem; margin-bottom: 1.5rem;">@lang( 'My Orders' )</h2>
+			<h1 class="mb-6">@lang( 'My Orders' )</h1>
 
 			@if($applications->isEmpty())
 				<div style="text-align: center; padding: 3rem 1rem; background: var(--3i-background-color); border-radius: var(--3i-border-radius); border: 1px solid var(--3i-border-color);">

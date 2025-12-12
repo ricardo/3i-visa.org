@@ -123,7 +123,7 @@
 					>
 				</div>
 
-				<button type="submit" class="contrast mt-6 mb-0" :aria-busy="isLoading">
+				<button type="submit" class="contrast mt-4 mb-0" :aria-busy="isLoading">
 					<span x-show="!isLoading">
 						<span x-show="step === 1">@lang( 'Continue' )</span>
 						<span x-show="step === 2">@lang( 'Log in' )</span>
