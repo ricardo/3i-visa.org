@@ -806,15 +806,7 @@ class SiteController extends Controller {
 		}
 	}
 
-	public function paymentSuccess( Request $request, $country ) {
-		// Slug to country code mapping.
-		$slug_to_code = array_flip( Countries::getCountrySlugs() );
-		$country_code = $slug_to_code[ $country ] ?? null;
-
-		if ( ! $country_code ) {
-			abort( 404 );
-		}
-
+	public function paymentSuccess( Request $request ) {
 		// Get payment intent ID from query string.
 		$payment_intent_id = $request->query( 'payment_intent' );
 
@@ -822,7 +814,7 @@ class SiteController extends Controller {
 		$requested_order_number = $request->query( 'order_number' );
 
 		if ( ! $payment_intent_id && ! $requested_order_number ) {
-			return redirect()->route( 'apply', [ 'country' => $country ] )
+			return redirect()->route( 'home' )
 				->with( 'error', __( 'Invalid payment session.' ) );
 		}
 
@@ -842,9 +834,13 @@ class SiteController extends Controller {
 		}
 
 		if ( ! $application ) {
-			return redirect()->route( 'apply', [ 'country' => $country ] )
+			return redirect()->route( 'home' )
 				->with( 'error', __( 'Payment session not found.' ) );
 		}
+
+		// Get country from application
+		$country_slug = Countries::getCountrySlug( $application->destination_country_code );
+		$country_code = $application->destination_country_code;
 
 		// Only verify payment with Stripe if we have a payment intent ID (new payment)
 		if ( $payment_intent_id ) {
@@ -865,11 +861,11 @@ class SiteController extends Controller {
 					$this->createOrAssociateUser( $application );
 				} else {
 					// Payment not successful.
-					return redirect()->route( 'apply', [ 'country' => $country ] )
+					return redirect()->route( 'apply', [ 'country' => $country_slug ] )
 						->with( 'error', __( 'Payment was not successful. Please try again.' ) );
 				}
 			} catch ( \Exception $e ) {
-				return redirect()->route( 'apply', [ 'country' => $country ] )
+				return redirect()->route( 'apply', [ 'country' => $country_slug ] )
 					->with( 'error', __( 'Error verifying payment. Please contact support.' ) );
 			}
 		}
@@ -887,7 +883,7 @@ class SiteController extends Controller {
 		}
 
 		// Get pricing configuration (use slug, not code).
-		$pricing_config = config( "pricing.{$country}" );
+		$pricing_config = config( "pricing.{$country_slug}" );
 		if ( ! $pricing_config ) {
 			$pricing_config = config( 'pricing.colombia' );
 		}
@@ -901,7 +897,7 @@ class SiteController extends Controller {
 		return view( 'pages.payment-success', [
 			'country_name' => Countries::getCountryName( $country_code ),
 			'country_code' => $country_code,
-			'country_slug' => $country,
+			'country_slug' => $country_slug,
 			'application' => $application,
 			'user_applications' => $user_applications,
 			'currency_symbol' => $currency_symbol,
@@ -987,5 +983,26 @@ class SiteController extends Controller {
 				] );
 			}
 		}
+	}
+
+	/**
+	 * Show user account page with all orders.
+	 *
+	 * @param \Illuminate\Http\Request $request
+	 * @return \Illuminate\View\View
+	 */
+	public function getAccount( Request $request ) {
+		$user = auth()->user();
+
+		// Get all visa applications for this user, excluding drafts, ordered by most recent first
+		$applications = \App\Models\VisaApplication::where( 'user_id', $user->id )
+			->where( 'status', '!=', 'draft' )
+			->orderBy( 'created_at', 'desc' )
+			->get();
+
+		return view( 'pages.account', [
+			'user' => $user,
+			'applications' => $applications,
+		] );
 	}
 }

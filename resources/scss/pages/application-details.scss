@@ -318,12 +318,13 @@
 // Progress Steps Indicator
 .progress-steps {
 	display: flex;
-	align-items: center;
 	justify-content: space-between;
+	align-items: flex-start;
 	gap: 0;
 	width: 100%;
 	margin-bottom: calc( var( --3i-spacing ) * 2 );
 	padding: calc( var( --3i-spacing ) * 1.5 ) 0;
+	border: 1px solid var( --3i-border-color );
 }
 
 .progress-step {

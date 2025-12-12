@@ -47,7 +47,7 @@
 						required
 					>
 
-					<button type="submit" class="contrast mb-0">
+					<button type="submit" class="contrast mt-4 mb-0">
 						@lang( 'Set Password' )
 					</button>
 				</form>
@@ -66,7 +66,7 @@
 						autofocus
 					>
 
-					<button type="submit" class="contrast mb-0">
+					<button type="submit" class="contrast mt-4 mb-0">
 						@lang( 'Send Reset Link' )
 					</button>
 				</form>

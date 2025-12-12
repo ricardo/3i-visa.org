@@ -48,7 +48,24 @@ body > header {
 		svg {
 			width: .88rem !important;
 			height: .88rem !important;
-			margin-left: .25rem;
+			// margin-left: .25rem;
+		}
+	}
+
+	.user-button {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+
+		svg {
+			width: 1rem !important;
+			height: 1rem !important;
+		}
+
+		span {
+			@include respond-to( md ) {
+				display: none;
+			}
 		}
 	}
 

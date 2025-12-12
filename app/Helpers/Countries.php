@@ -128,7 +128,7 @@ class Countries {
 	 */
 	public static function getCountryName( $code ) {
 		$translations = trans('countries');
-		return $translations[ $code ] ?? '';
+		return $translations[ strtolower( $code ) ] ?? '';
 	}
 
 	/**
@@ -147,6 +147,17 @@ class Countries {
 			'br' => 'brazil',
 			'co' => 'colombia',
 		];
+	}
+
+	/**
+	 * Get slug for a specific country code
+	 *
+	 * @param string $code ISO country code
+	 * @return string Country slug or lowercase code if not found in mapping
+	 */
+	public static function getCountrySlug( $code ) {
+		$slugs = self::getCountrySlugs();
+		return $slugs[ strtolower( $code ) ] ?? strtolower( $code );
 	}
 
 }

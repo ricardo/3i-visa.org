@@ -9,6 +9,11 @@
 		gap: 1rem;
 		font-size: .9rem;
 
+		a {
+			color: var( --3i-font-color );
+			text-decoration-color: var( --3i-font-color );
+		}
+
 		.alert-banner-icon {
 			flex-shrink: 0;
 			width: 1.5rem;

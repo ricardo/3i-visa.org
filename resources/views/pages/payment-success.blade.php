@@ -5,35 +5,27 @@
 		<div class="payment-success-page">
 			<div class="payment-success-content">
 				<!-- Success Hero -->
-				<div class="success-hero text-center mb-7">
-					<div class="success-icon mb-3">
-						<svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #28a745; margin: 0 auto;">
-							<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-							<polyline points="22 4 12 14.01 9 11.01"></polyline>
-						</svg>
-					</div>
-					<h1>@lang( 'Payment Successful!' )</h1>
-					<p class="lead">@lang( 'Thank you for your order' )</p>
+				<div class="success-hero text-center mt-6 mb-7">
+
+					<h1 class="mb-6">
+						@lang( 'Payment Successful' )
+					</h1>
+
+					<!-- <p class="lead">@lang( 'Thank you for your order' )</p> -->
 
 					@auth
-						@if($is_new_payment)
-							<!-- Welcome message for new users -->
-							<div class="alert mt-5" style="background: #e3f2fd; border-color: #2196F3;">
-								<p class="mb-0">
-									<strong>@lang('Welcome!')</strong> @lang('Your account has been created. Check your email to set your password and access your orders anytime.')
-								</p>
-							</div>
+						@if ( $is_new_payment )
+							<x-alert type="info">
+								<strong>@lang( 'Welcome!' )</strong> @lang( 'Your account has been created. Check your email to set your password and access your orders anytime.' )
+							</x-alert>
 						@endif
 					@else
-						@if($is_new_payment)
-							<!-- Login prompt for existing users -->
-							<div class="alert mt-5" style="background: #fff3cd; border-color: #ffc107;">
-								<p class="mb-0">
-									@lang('You already have an account with us.')
-									<a href="{{ route('login') }}" style="text-decoration: underline; font-weight: 600;">@lang('Log in')</a>
-									@lang('to view all your orders.')
-								</p>
-							</div>
+						@if ( $is_new_payment )
+							<x-alert type="info">
+								@lang('You already have an account with us.')
+								<a href="{{ route('login') }}" class="underline font-semibold">@lang('Log in')</a>
+								@lang('to view all your orders.')
+							</x-alert>
 						@endif
 					@endauth
 				</div>
@@ -112,7 +104,7 @@
 				</div>
 
 				<!-- Order Details -->
-				<article class="success-details">
+				<div style="padding: 1rem;padding-bottom: 8rem;">
 					<h2>@lang( 'Order Details' )</h2>
 
 					<div class="order-info mt-5">
@@ -133,7 +125,7 @@
 
 						<div class="info-row">
 							<span class="info-label">@lang( 'Processing Option' ):</span>
-							<span class="info-value">{{ ucfirst( $application->processing_option ) }}</span>
+							<span class="info-value">@lang( ucfirst( $application->processing_option ) )</span>
 						</div>
 
 						<div class="info-row">
@@ -167,7 +159,7 @@
 					</div>
 
 					<!-- Next Steps -->
-					<div class="next-steps mt-5">
+					<div class="next-steps mt-7">
 						<h3>@lang( 'What happens next?' )</h3>
 						<ol>
 							<li>@lang( 'We will review your application and passport details.' )</li>
@@ -175,14 +167,7 @@
 							<li>@lang( 'You will receive your approved visa via email.' )</li>
 						</ol>
 					</div>
-
-					<!-- Action Buttons -->
-					<div class="success-actions mt-7 text-center">
-						<a href="{{ route( 'home' ) }}" class="contrast">
-							@lang( 'Return to Home' )
-						</a>
-					</div>
-				</article>
+				</div>
 			</div>
 		</div>
 	</main>
@@ -208,7 +193,7 @@
 			content: '';
 			position: absolute;
 			left: 19px;
-			top: 48px;
+			top: 40px;
 			width: 2px;
 			height: calc(100% + 24px);
 			background: #dee2e6;

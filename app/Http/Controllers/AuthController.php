@@ -91,7 +91,7 @@ class AuthController extends Controller {
 			// Authentication successful
 			$request->session()->regenerate();
 
-			return redirect()->intended( route( 'home' ) );
+			return redirect()->intended( route( 'account' ) );
 		}
 
 		// Authentication failed
@@ -129,8 +129,37 @@ class AuthController extends Controller {
 	 * @return \Illuminate\Http\RedirectResponse
 	 */
 	public function postPasswordRequest( Request $request ) {
-		// TODO: Implement password reset request
-		return redirect()->route( 'login' )->with( 'success', __( 'Password reset link sent to your email.' ) );
+		$request->validate( [
+			'email' => 'required|email',
+		] );
+
+		// Find user by email
+		$user = \App\Models\User::where( 'email', $request->email )->first();
+
+		if ( ! $user ) {
+			return redirect()->back()
+				->withInput( $request->only( 'email' ) )
+				->with( 'error', __( 'No account found with this email address.' ) );
+		}
+
+		// Generate password reset token
+		$token = \Illuminate\Support\Facades\Password::broker()->createToken( $user );
+
+		// Send password reset notification
+		try {
+			$user->notify( new \App\Notifications\ResetPasswordNotification( $token ) );
+
+			return redirect()->route( 'login' )->with( 'success', __( 'Password reset link sent to your email.' ) );
+		} catch ( \Exception $e ) {
+			\Log::error( 'Failed to send password reset email', [
+				'user_id' => $user->id,
+				'error' => $e->getMessage(),
+			] );
+
+			return redirect()->back()
+				->withInput( $request->only( 'email' ) )
+				->with( 'error', __( 'An unexpected error occurred.' ) );
+		}
 	}
 
 	/**
@@ -172,7 +201,7 @@ class AuthController extends Controller {
 		);
 
 		if ( $status === \Illuminate\Support\Facades\Password::PASSWORD_RESET ) {
-			return redirect()->route( 'home' )->with( 'success', __( 'Password has been set. You are now logged in!' ) );
+			return redirect()->route( 'account' )->with( 'success', __( 'Password has been set. You are now logged in!' ) );
 		}
 
 		return redirect()->back()

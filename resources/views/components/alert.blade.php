@@ -28,7 +28,7 @@
 	$style = $styles[$type] ?? $styles['error'];
 @endphp
 
-<div class="alert-banner" style="background-color: {{ $style['bg'] }}; color: {{ $style['color'] }};">
+<div class="alert-banner" style="background-color: {{ $style['bg'] }}; --3i-font-color: {{ $style['color'] }}; color: {{ $style['color'] }};">
 	<div class="alert-banner-content">
 		<div class="alert-banner-icon">
 			@if($style['icon'] === 'warning')
