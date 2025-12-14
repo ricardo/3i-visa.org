@@ -107,7 +107,7 @@
     "Currency": "Currency",
     "Select currency...": "Select currency...",
     "Save preferences": "Save preferences",
-    "Pay now": "Pay now",
+    "Pay": "Pay",
     "Processing...": "Processing...",
     "Loading payment form...": "Loading payment form...",
     "Payment Successful!": "Payment Successful!",
@@ -208,5 +208,8 @@
     "Logout": "Logout",
     "Payment Successful": "Payment Successful",
     "Your approved :country Check-MIG Form will be sent to this email address once processed.": "Your approved :country Check-MIG Form will be sent to this email address once processed.",
-    "Refund Policy": "Refund Policy"
+    "Refund Policy": "Refund Policy",
+    "Regards,": "Regards,",
+    "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below into your web browser:": "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below into your web browser:",
+    "Whoops!": "Whoops!"
 }

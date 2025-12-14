@@ -36,6 +36,22 @@
 			} );
 		} )();
 	</script>
+
+	{{-- Prevent "Page has expired" alert on Livewire components --}}
+	<script>
+		document.addEventListener( 'livewire:init', () => {
+			Livewire.hook( 'commit', ( { component, commit, respond, succeed, fail } ) => {
+				fail( ( { status, preventDefault } ) => {
+					// Check if it's a token mismatch error (419 status)
+					if ( status === 419 ) {
+						preventDefault();
+						// Silently refresh the page to get a new CSRF token
+						window.location.reload();
+					}
+				} );
+			} );
+		} );
+	</script>
 @endpush
 
 @if ( isset( $errors ) && $errors->any() )

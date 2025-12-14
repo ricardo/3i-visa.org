@@ -1,0 +1,17 @@
+<?php
+
+return [
+    'confirmed' => 'The :attribute field confirmation does not match.',
+    'email' => 'The :attribute field must be a valid email address.',
+    'min' => [
+        'string' => 'The :attribute field must be at least :min characters.',
+    ],
+    'required' => 'The :attribute field is required.',
+    'string' => 'The :attribute field must be a string.',
+
+    'attributes' => [
+        'email' => 'email',
+        'password' => 'password',
+        'password_confirmation' => 'password confirmation',
+    ],
+];

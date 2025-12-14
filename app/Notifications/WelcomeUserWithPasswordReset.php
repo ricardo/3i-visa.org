@@ -20,12 +20,21 @@ class WelcomeUserWithPasswordReset extends Notification implements ShouldQueue {
 	protected $application;
 
 	/**
+	 * The locale for this notification.
+	 *
+	 * @var string
+	 */
+	public $locale;
+
+	/**
 	 * Create a new notification instance.
 	 *
 	 * @param \App\Models\VisaApplication $application
 	 */
 	public function __construct( VisaApplication $application ) {
 		$this->application = $application;
+		// Store the application's locale when the notification is created
+		$this->locale = $application->locale ?? app()->getLocale();
 	}
 
 	/**
@@ -45,19 +54,23 @@ class WelcomeUserWithPasswordReset extends Notification implements ShouldQueue {
 	 * @return \Illuminate\Notifications\Messages\MailMessage
 	 */
 	public function toMail( $notifiable ) {
+		// Determine the locale to use (user's locale, notification's locale, or fallback to 'en')
+		$user_locale = $notifiable->locale ?? $this->locale ?? 'en';
+
+		// Set the application locale for rendering
+		app()->setLocale( $user_locale );
+
 		// Generate password reset token
 		$token = Password::broker()->createToken( $notifiable );
 
-		// Build password reset URL
-		$reset_url = url( route( 'password.reset', [
-			'token' => $token,
-			'email' => $notifiable->email,
-		], false ) );
+		// Build password reset URL with locale prefix
+		$locale_prefix = ( $user_locale && $user_locale !== 'en' ) ? $user_locale . '/' : '';
+		$reset_url = url( $locale_prefix . 'password/reset/' . $token . '?email=' . urlencode( $notifiable->email ) );
 
 		// Get country name
 		$country_name = \App\Helpers\Countries::getCountryName( $this->application->destination_country_code );
 
-		return ( new MailMessage )
+		$message = ( new MailMessage )
 			->subject( __( 'Welcome to 3i Visa - Your Order Confirmation' ) )
 			->greeting( __( 'Welcome to 3i Visa!' ) )
 			->line( __( 'Thank you for your order! We have created an account for you to track your visa application.' ) )
@@ -69,5 +82,7 @@ class WelcomeUserWithPasswordReset extends Notification implements ShouldQueue {
 			->action( __( 'Set Your Password' ), $reset_url )
 			->line( __( 'Once you set your password, you can log in to view your application status and download your documents when ready.' ) )
 			->line( __( 'If you did not create this account, please ignore this email.' ) );
+
+		return $message;
 	}
 }

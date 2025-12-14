@@ -198,7 +198,7 @@
 								$display_total = $currency_symbol . $formatted_amount;
 							}
 						@endphp
-						Pay {{ $display_total }} {{ strtoupper($currency_code) }}
+						@lang( 'Pay' ) {{ $display_total }} {{ strtoupper($currency_code) }}
 					</span>
 					<span x-show="isLoading">@lang( 'Processing...' )</span>
 				</button>

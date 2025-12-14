@@ -36,7 +36,13 @@
 						placeholder="@lang('Enter your new password')"
 						required
 						autofocus
+						aria-invalid="{{ $errors->has('password') ? 'true' : '' }}"
 					>
+					@if($errors->has('password'))
+						<small>
+							{{ $errors->first('password') }}
+						</small>
+					@endif
 
 					<label for="password_confirmation">@lang( 'Confirm Password' )</label>
 					<input
@@ -45,7 +51,13 @@
 						name="password_confirmation"
 						placeholder="@lang('Confirm your new password')"
 						required
+						aria-invalid="{{ $errors->has('password_confirmation') ? 'true' : '' }}"
 					>
+					@if($errors->has('password_confirmation'))
+						<small>
+							{{ $errors->first('password_confirmation') }}
+						</small>
+					@endif
 
 					<button type="submit" class="contrast mt-4 mb-0">
 						@lang( 'Set Password' )
@@ -64,7 +76,14 @@
 						placeholder="@lang('john@example.com')"
 						required
 						autofocus
+						aria-invalid="{{ $errors->has('email') ? 'true' : '' }}"
+						value="{{ old('email') }}"
 					>
+					@if($errors->has('email'))
+						<small>
+							{{ $errors->first('email') }}
+						</small>
+					@endif
 
 					<button type="submit" class="contrast mt-4 mb-0">
 						@lang( 'Send Reset Link' )
