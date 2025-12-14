@@ -66,7 +66,7 @@
 
 					<div class="progress-step" data-status="{{ $current_step > 1 ? 'completed' : 'active' }}">
 						<div class="step-indicator">
-							@if($current_step > 1)
+							@if ( $current_step > 1 )
 								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
 									<polyline points="20 6 9 17 4 12"></polyline>
 								</svg>

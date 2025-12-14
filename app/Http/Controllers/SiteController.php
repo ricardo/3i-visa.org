@@ -867,7 +867,7 @@ class SiteController extends Controller {
 
 		// Only verify payment with Stripe if we have a payment intent ID (new payment)
 		// Default payment state
-		$payment_state = 'pending_payment';
+		$payment_state = 'succeeded';
 
 		// Only verify payment with Stripe if we have a payment intent ID (new payment)
 		if ( $payment_intent_id ) {
