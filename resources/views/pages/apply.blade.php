@@ -80,43 +80,43 @@
 
 			<!-- Info Card Sidebar -->
 			<aside class="apply-sidebar display-desktop-only">
-				<div class="apply-info-card">
-					<h3>@lang( ':country :document', [ 'country' => $country_name, 'document' => __($document_type) ] )</h3>
+				@if ( $is_available )
+					<div class="apply-info-card">
+						<h3>@lang( ':country :document', [ 'country' => $country_name, 'document' => __($document_type) ] )</h3>
 
-					<div class="apply-info-items">
-						<div class="apply-info-item">
-							<!-- TODO: Icon suggestion - Calendar icon for validity period -->
-							<div class="apply-info-icon">
-								@include( 'icons.calendar' )
+						<div class="apply-info-items">
+							<div class="apply-info-item">
+								<!-- TODO: Icon suggestion - Calendar icon for validity period -->
+								<div class="apply-info-icon">
+									@include( 'icons.calendar' )
+								</div>
+								<div class="apply-info-details">
+									<div class="apply-info-label">@lang( 'Valid for' )</div>
+									<div class="apply-info-value">@lang( '90 days after arrival' )</div>
+								</div>
 							</div>
-							<div class="apply-info-details">
-								<div class="apply-info-label">@lang( 'Valid for' )</div>
-								<div class="apply-info-value">@lang( '90 days after arrival' )</div>
-							</div>
-						</div>
 
-						<div class="apply-info-item">
-							<div class="apply-info-icon">
-								@include( 'icons.airplane-landing' )
+							<div class="apply-info-item">
+								<div class="apply-info-icon">
+									@include( 'icons.airplane-landing' )
+								</div>
+								<div class="apply-info-details">
+									<div class="apply-info-label">@lang( 'Number of entries' )</div>
+									<div class="apply-info-value">@lang( 'Single entry' )</div>
+								</div>
 							</div>
-							<div class="apply-info-details">
-								<div class="apply-info-label">@lang( 'Number of entries' )</div>
-								<div class="apply-info-value">@lang( 'Single entry' )</div>
-							</div>
-						</div>
 
-						<div class="apply-info-item">
-							<div class="apply-info-icon">
-								@include( 'icons.calendar-clock' )
-							</div>
-							<div class="apply-info-details">
-								<div class="apply-info-label">@lang( 'Max stay' )</div>
-								<div class="apply-info-value">@lang( '90 days per entry' )</div>
+							<div class="apply-info-item">
+								<div class="apply-info-icon">
+									@include( 'icons.calendar-clock' )
+								</div>
+								<div class="apply-info-details">
+									<div class="apply-info-label">@lang( 'Max stay' )</div>
+									<div class="apply-info-value">@lang( '90 days per entry' )</div>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-				@if( $is_available )
 					<button
 						type="submit"
 						form="apply-form"
@@ -128,7 +128,7 @@
 					<a
 						href="{{ route( 'home' ) }}"
 						role="button"
-						class="apply-submit-button mb-0"
+						class="apply-submit-button mt-6 mb-0"
 						style="display: block; text-align: center; text-decoration: none;"
 					>
 						@lang( 'Check Other Destinations' )
