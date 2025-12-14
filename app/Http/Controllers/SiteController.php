@@ -859,9 +859,15 @@ class SiteController extends Controller {
 				->with( 'error', __( 'Payment session not found.' ) );
 		}
 
+		$this->createOrAssociateUser( $application );
+
 		// Get country from application
 		$country_slug = Countries::getCountrySlug( $application->destination_country_code );
 		$country_code = $application->destination_country_code;
+
+		// Only verify payment with Stripe if we have a payment intent ID (new payment)
+		// Default payment state
+		$payment_state = 'pending_payment';
 
 		// Only verify payment with Stripe if we have a payment intent ID (new payment)
 		if ( $payment_intent_id ) {
@@ -871,23 +877,23 @@ class SiteController extends Controller {
 			try {
 				$payment_intent = \Stripe\PaymentIntent::retrieve( $payment_intent_id );
 
-				// Check if payment was successful.
 				if ( $payment_intent->status === 'succeeded' ) {
-					// Update application status to paid.
-					$application->status = 'paid';
+					$application->status  = 'paid';
 					$application->paid_at = now();
 					$application->save();
 
-					// Create or associate user account
-					$this->createOrAssociateUser( $application );
+					$payment_state = 'succeeded';
 				} else {
-					// Payment not successful.
-					return redirect()->route( 'apply', [ 'country' => $country_slug ] )
-						->with( 'error', __( 'Payment was not successful. Please try again.' ) );
+					/**
+					 * Stripe states like:
+					 * - requires_payment_method
+					 * - requires_confirmation
+					 * - processing
+					 */
+					$payment_state = 'pending_payment';
 				}
 			} catch ( \Exception $e ) {
-				return redirect()->route( 'apply', [ 'country' => $country_slug ] )
-					->with( 'error', __( 'Error verifying payment. Please contact support.' ) );
+				$payment_state = 'pending_payment';
 			}
 		}
 
@@ -925,6 +931,7 @@ class SiteController extends Controller {
 			'currency_config' => $currency_config,
 			'total_amount' => $total_amount,
 			'pricing_config' => $pricing_config,
+			'payment_state'  => $payment_state,
 			'is_new_payment' => $payment_intent_id !== null,
 		] );
 	}

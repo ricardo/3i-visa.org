@@ -9,11 +9,11 @@
 					@php
 						// Determine current step title based on application status
 						$step_title = match($application->status) {
-							'paid' => __('Information Under Review'),
-							'processing' => __('Information Under Review'),
-							'approved' => __('Check-MIG Form Ready'),
-							'completed' => __('Check-MIG Form Ready'),
-							default => __('Payment Successful'),
+							'paid' => __( 'Information Under Review' ),
+							'processing' => __( 'Information Under Review' ),
+							'approved' => __( 'Check-MIG Form Ready' ),
+							'completed' => __( 'Check-MIG Form Ready' ),
+							default => __( 'Pending Payment' ),
 						};
 					@endphp
 
@@ -25,6 +25,15 @@
 						@lang( 'Order Number' ): {{ $application->order_number }}
 					</p>
 
+					@if ( $payment_state === 'pending_payment' )
+						<x-alert type="info">
+							<strong>@lang( 'Payment pending' )</strong><br>
+							@lang( 'We are confirming your payment with the provider. This usually takes a few minutes.' )
+							<br>
+							@lang( 'You will receive an email once the payment is confirmed.' )
+						</x-alert>
+					@endif
+
 					@auth
 						@if ( $is_new_payment )
 							<x-alert type="info">
@@ -34,59 +43,55 @@
 					@else
 						@if ( $is_new_payment )
 							<x-alert type="info">
-								@lang('You already have an account with us.')
-								<a href="{{ route('login') }}" class="underline font-semibold">@lang('Log in')</a>
+								@lang( 'You already have an account with us.' )
+								<a href="{{ route('login') }}" class="underline font-semibold">@lang( 'Log in' )</a>
 								@lang('to view all your orders.')
 							</x-alert>
 						@endif
 					@endauth
 				</div>
 
-				<!-- Order Selector (for users with multiple orders) -->
-				@auth
-					<x-order-selector
-						:applications="$user_applications"
-						:current_application_id="$application->id"
-						:country_slug="$country_slug"
-					/>
-				@endauth
-
 				<!-- Progress Steps -->
 				<div class="progress-steps mb-7">
 					@php
 						// Determine current step based on application status
-						$current_step = match($application->status) {
+						$current_step = match( $application->status ) {
 							'paid' => 2,
 							'processing' => 2,
 							'approved' => 3,
 							'completed' => 3,
-							default => 2,
+							default => 1,
 						};
 					@endphp
 
-					<div class="progress-step" data-status="{{ $current_step >= 1 ? 'completed' : 'pending' }}">
+					<div class="progress-step" data-status="{{ $current_step > 1 ? 'completed' : 'active' }}">
 						<div class="step-indicator">
-							@if($current_step >= 1)
+							@if($current_step > 1)
 								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
 									<polyline points="20 6 9 17 4 12"></polyline>
 								</svg>
 							@else
-								<span>1</span>
+								<div class="step-spinner"></div>
 							@endif
 						</div>
 						<div class="step-content">
-							<div class="step-title">@lang('Payment Successful')</div>
-							<div class="step-description">@lang('Your payment has been processed')</div>
+							@if ( $payment_state === 'pending_payment' )
+								<div class="step-title">@lang( 'Pending Payment' )</div>
+								<div class="step-description">@lang( 'Your payment is awaiting approval' )</div>
+							@else
+								<div class="step-title">@lang( 'Payment Successful' )</div>
+								<div class="step-description">@lang( 'Your payment has been processed' )</div>
+							@endif
 						</div>
 					</div>
 
 					<div class="progress-step" data-status="{{ $current_step >= 2 ? ($current_step == 2 ? 'active' : 'completed') : 'pending' }}">
 						<div class="step-indicator">
-							@if($current_step > 2)
+							@if ( $current_step > 2 )
 								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
 									<polyline points="20 6 9 17 4 12"></polyline>
 								</svg>
-							@elseif($current_step == 2)
+							@elseif ( $current_step == 2 )
 								<div class="step-spinner"></div>
 							@else
 								<span>2</span>
@@ -100,7 +105,7 @@
 
 					<div class="progress-step" data-status="{{ $current_step >= 3 ? 'completed' : 'pending' }}">
 						<div class="step-indicator">
-							@if($current_step >= 3)
+							@if ( $current_step >= 3 )
 								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
 									<polyline points="20 6 9 17 4 12"></polyline>
 								</svg>
