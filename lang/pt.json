@@ -227,5 +227,12 @@
     "Apply and pay in under 10 minutes": "Solicite e pague em menos de 10 minutos",
     "Fill out your travel details and pay securely. Then, upload any other required docs.": "Preencha os detalhes da sua viagem e pague com segurança. Em seguida, carregue quaisquer outros documentos necessários.",
     "We'll handle the rest": "Nós cuidaremos do resto",
-    "Our AI technology + human experts check everything to ensure a smooth approval.": "Nossa tecnologia de IA + especialistas humanos verificam tudo para garantir uma aprovação tranquila."
+    "Our AI technology + human experts check everything to ensure a smooth approval.": "Nossa tecnologia de IA + especialistas humanos verificam tudo para garantir uma aprovação tranquila.",
+    "A visa is required to travel to :country but 3i Visa cannot provide it at this time.": "É necessário um visto para viajar para :country, mas a iVisa não pode fornecê-lo no momento.",
+    "Check Other Destinations": "Verificar Outros Destinos",
+    "Visa": "Visto",
+    "Check-MIG Form": "Formulário Check-MIG",
+    "Apply for :country :document": "Solicitar :document para :country",
+    "Apply now for your :country :document": "Solicite agora seu :document para :country",
+    ":country :document": ":document de :country"
 }

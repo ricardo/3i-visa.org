@@ -13,6 +13,19 @@ return [
 		'base_form_price_usd' => 49,
 
 		/**
+		 * Document type name
+		 * This will be translated and used in UI (e.g., "Check-MIG Form", "Visa", "eTA")
+		 * If not specified, defaults to "Visa"
+		 */
+		'document_type' => 'Check-MIG Form',
+
+		/**
+		 * Allowed nationalities (country codes)
+		 * Only these passport holders can apply for this destination
+		 */
+		'allowed_nationalities' => [ 'br', 'us' ],
+
+		/**
 		 * Visa details
 		 */
 		'visa_details' => [

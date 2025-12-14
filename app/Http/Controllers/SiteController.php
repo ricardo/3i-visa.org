@@ -199,6 +199,20 @@ class SiteController extends Controller {
 			}
 		}
 
+		// Check if visa application is available for this nationality and destination.
+		$is_available = false;
+		$pricing_config = config( "pricing.{$country}" );
+
+		if ( $pricing_config ) {
+			// Country exists in pricing config, check if nationality is allowed.
+			$allowed_nationalities = $pricing_config['allowed_nationalities'] ?? [];
+			$is_available = in_array( $nationality, $allowed_nationalities );
+		}
+		// If country doesn't exist in pricing config, $is_available remains false.
+
+		// Get document type from pricing config, fallback to "Visa"
+		$document_type = $pricing_config['document_type'] ?? 'Visa';
+
 		return view( 'pages.apply', [
 			'country_name' => Countries::getCountryName( $country_code ),
 			'country_code' => $country_code,
@@ -206,6 +220,8 @@ class SiteController extends Controller {
 			'visa_countries' => $visa_countries,
 			'selected_nationality' => $selected_nationality,
 			'application' => $application,
+			'is_available' => $is_available,
+			'document_type' => $document_type,
 		] );
 	}
 
