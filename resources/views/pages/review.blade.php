@@ -215,9 +215,8 @@
 						</div>
 						<div class="review-denial-content">
 							<div class="review-denial-header">
+								<label class="review-denial-title">@lang( 'Add denial protection' ) + <span x-text="currencySymbol"></span><span x-text="formattedDenialProtectionPriceOnly"></span></label>
 								@include( 'icons.shield-check' )
-								<label class="review-denial-title">@lang('Add denial protection')</label>
-								<div class="review-denial-price">+ <span x-text="currencySymbol"></span><span x-text="formattedDenialProtectionPriceOnly"></span></div>
 							</div>
 							<div class="review-denial-description">
 								{{ $denial_protection['description'] }}
@@ -305,7 +304,7 @@
 	@include( 'dialogs.stripe-payment', [
 		'country_slug' => $country_slug,
 		'total_price' => $total_price,
-		'currency_code' => $application->currency_code,
+		'currency_code' => $user_currency,
 		'currency_symbol' => $currency_symbol,
 		'currency_config' => $currency_config
 	] )

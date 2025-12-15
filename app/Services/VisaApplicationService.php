@@ -299,6 +299,7 @@ class VisaApplicationService {
 				'amount'      => $amount,
 				'currency'    => $currency_code,
 				'description' => "Visa Application - {$application->order_number}",
+				'statement_descriptor_suffix' => 'VISA',
 				'metadata'    => [
 					'visa_application_id' => $application->id,
 					'order_number'        => $application->order_number,

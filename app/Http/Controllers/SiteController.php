@@ -728,6 +728,7 @@ class SiteController extends Controller {
 			'price_per_traveler' => $price_per_traveler,
 			'currency_symbol' => $currency_symbol,
 			'currency_config' => $currency_config,
+			'user_currency' => $user_currency,
 			'processing_fee' => $processing_fee,
 			'processing_option' => $processing_option,
 			'processing_name' => $selected_option['name'],
