@@ -1,7 +1,7 @@
 @props([
 	'country_name' => 'Colombia',
 	'applicants_count' => 1,
-	'price_per_traveler' => .75,
+	'price_per_traveler' => 49,
 	'currency_symbol' => '$',
 ])
 
