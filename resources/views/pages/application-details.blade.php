@@ -227,7 +227,7 @@
 									:initial_expanded="$index === 1"
 									:initial_first_name="$existing_data['first_name'] ?? ''"
 									:initial_last_name="$existing_data['last_name'] ?? ''"
-									:initial_email="$existing_data['email'] ?? ''"
+									:initial_email="( auth()->check() ? auth()->user()->email : ( $existing_data['email'] ?? '' ) )"
 									:initial_dob_month="$existing_data['date_of_birth_month'] ?? ''"
 									:initial_dob_day="$existing_data['date_of_birth_day'] ?? ''"
 									:initial_dob_year="$existing_data['date_of_birth_year'] ?? ''"

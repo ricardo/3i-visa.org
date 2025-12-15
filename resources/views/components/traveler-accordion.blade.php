@@ -157,6 +157,7 @@
 						x-bind:aria-describedby="hasError('travelers.{{ $traveler_index }}.email') ? 'travelers-{{ $traveler_index }}-email-error' : null"
 						x-on:input="clearFieldError('travelers.{{ $traveler_index }}.email')"
 						placeholder="@lang('john@example.com')"
+						class="{{ auth()->check() ? 'disabled' : '' }}"
 					>
 					<small
 						id="travelers-{{ $traveler_index }}-email-error"
@@ -170,20 +171,22 @@
 					</small>
 				</div>
 
-				<!-- Marketing opt-in checkbox (first traveler only) -->
-				<div class="traveler-field traveler-field-full mt-5">
-					<label class="traveler-checkbox">
-						<input
-							type="checkbox"
-							name="travelers[{{ $traveler_index }}][marketing_optin]"
-							value="1"
-							{{ old('travelers.'.$traveler_index.'.marketing_optin', $initial_marketing_optin) ? 'checked' : '' }}
-						>
-						<span class="color-muted" style="font-weight: normal;font-size: .85rem">
-							@lang('I want to receive 3i Visa updates, product launches and personalized offers. I can opt out anytime. Terms and Privacy Policy apply.')
-						</span>
-					</label>
-				</div>
+				@guest
+					<!-- Marketing opt-in checkbox (first traveler only) -->
+					<div class="traveler-field traveler-field-full mt-5">
+						<label class="traveler-checkbox">
+							<input
+								type="checkbox"
+								name="travelers[{{ $traveler_index }}][marketing_optin]"
+								value="1"
+								{{ old('travelers.'.$traveler_index.'.marketing_optin', $initial_marketing_optin) ? 'checked' : '' }}
+							>
+							<span class="color-muted" style="font-weight: normal;font-size: .85rem">
+								@lang('I want to receive 3i Visa updates, product launches and personalized offers. I can opt out anytime. Terms and Privacy Policy apply.')
+							</span>
+						</label>
+					</div>
+				@endguest
 			@endif
 
 			@if ( ! $is_first )

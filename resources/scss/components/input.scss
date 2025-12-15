@@ -7,6 +7,11 @@ input:not([type=checkbox], [type=radio]), select, textarea, details.dropdown sum
 	background-color: white;
 	box-shadow: 0 1px 2px 0 rgb( 0 0 0 / 0.05 );
 
+	&.disabled {
+		pointer-events: none;
+		opacity: .5;
+	}
+
 	@include respond-to( 'lg' ) {
 		--3i-form-element-spacing-horizontal: 1rem;
 	}

@@ -279,7 +279,7 @@ class SiteController extends Controller {
 		$existing_travelers = $application->travelers->keyBy( 'traveler_index' )->toArray();
 
 		// Pricing and currency conversion.
-		$base_price_usd = 49; // Base price per traveler in USD.
+		$base_price_usd = .75; // Base price per traveler in USD.
 		$user_currency = $request->cookie( 'preferred_currency', 'USD' );
 		$price_per_traveler = Currencies::convertFromUSD( $base_price_usd, $user_currency );
 		$total_price = $price_per_traveler * $application->number_of_travelers;
@@ -402,7 +402,7 @@ class SiteController extends Controller {
 		$nationality = $application->nationality_country_code ? strtolower( $application->nationality_country_code ) : null;
 
 		// Pricing and currency conversion.
-		$base_price_usd = 49; // Base price per traveler in USD.
+		$base_price_usd = .75; // Base price per traveler in USD.
 		$user_currency = $request->cookie( 'preferred_currency', 'USD' );
 		$price_per_traveler = Currencies::convertFromUSD( $base_price_usd, $user_currency );
 		$currency_symbol = Currencies::getSymbol( $user_currency );
