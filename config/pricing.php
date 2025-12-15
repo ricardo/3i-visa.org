@@ -10,7 +10,7 @@ return [
 		/**
 		 * Base form price per traveler (in USD)
 		 */
-		'base_form_price_usd' => 49,
+		'base_form_price_usd' => .75,
 
 		/**
 		 * Document type name
