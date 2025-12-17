@@ -1,6 +1,6 @@
 @php
 	$default_title       = '3i Visa';
-	$default_description = '3i Visa description';
+	$default_description = '';
 	$default_keywords	 = '3i Visa, 3i-visa.org';
 @endphp
 <meta charset="utf-8">
