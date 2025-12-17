@@ -33,39 +33,26 @@ section.hero {
 		width: 100%;
 	}
 
-	.video {
-		--demo-border-gradient: linear-gradient( 0deg, var( --3i-demo-border-gradient-colors ) );
-		display: flex;
-		position: relative;
-		flex-direction: column;
-		width: 100%;
-		max-width: 700px;
-		margin-top: calc( var( --3i-spacing ) * 1.5 );
-		box-sizing: border-box;
+	.hero-badge {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		backdrop-filter: blur( 4px );
+		box-shadow: var( --3i-box-shadow );
+		color: var( --3i-original-color );
+		font-size: .8rem;
+		padding: .4rem 1.2rem;
+		border-radius: var( --3i-border-radius );
+		margin-bottom: 1rem;
+		font-size: .9rem;
 
-		&::before, &::after {
-			z-index: -1;
-			position: absolute;
-			inset: -4px;
-			border-radius: calc( var( --3i-border-radius ) * 2 );
-			background: var( --demo-border-gradient );
-			content: "";
+		width: auto;
+		background: rgba( $slate-100, 0.5 );
+		border: 1px solid #acabbe;
+		text-wrap: pretty;
 
-		}
-
-		&::before {
-			inset: -3rem;
-			filter: blur(3rem);
-			opacity: .25;
-		}
-
-		article {
-			padding: 0;
-			background-color: var( --3i-original-background-color );
-			z-index: 0;
-			box-shadow: none;
-			border-radius: calc(var(--3i-border-radius) * 2);
-			overflow: hidden;
+		a {
+			color: var( --3i-original-color );
 		}
 	}
 

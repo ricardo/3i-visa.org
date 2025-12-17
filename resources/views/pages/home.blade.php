@@ -27,6 +27,9 @@
 @section( 'content' )
 	<main class="landing">
 		<section class="hero medium container">
+			<div class="hero-badge">
+				3i Visa is a private, third-party platform that helps travelers fill out travel forms. We are not affiliated with any government agency.
+			</div>
 			<h1 id="main-heading" class="color-highlight">
 				@lang( 'The' ) <mark>@lang( 'easiest' )</mark> @lang( 'way to get your travel visa' )
 			</h1>
