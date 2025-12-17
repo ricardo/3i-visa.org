@@ -1,4 +1,4 @@
-@extends( 'layouts/main', [ 'footer' => false ] )
+@extends( 'layouts/main' )
 @section( 'title', __( 'Passport Details' ) . ' • 3i Visa' )
 @section( 'content' )
 	<!-- Mobile Progress Bar -->
@@ -176,18 +176,12 @@
 							<span x-text="travelerCount"></span> <span x-text="travelerCount === 1 ? '@lang('traveler')' : '@lang('travelers')'"></span>
 						</div>
 					</div>
-					<div class="order-summary-row">
-						<div class="order-summary-label">@lang('Standard, 3 days')</div>
-						<div class="order-summary-value">
-							<span x-text="formattedTotal"></span>
-						</div>
-					</div>
 				</div>
 
 				<!-- Total Section -->
 				<div class="order-total-section">
-					<div class="order-total-label">@lang('Total')</div>
-					<div class="order-total-calculated">@lang('Calculated at checkout')</div>
+					<div class="order-total-label">@lang( 'Total' )</div>
+					<div class="order-total-calculated">@lang( 'Calculated at checkout' )</div>
 				</div>
 
 				<!-- Save and Continue Button -->

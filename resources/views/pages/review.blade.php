@@ -1,4 +1,4 @@
-@extends( 'layouts/main', [ 'footer' => false ] )
+@extends( 'layouts/main' )
 @section( 'title', __( 'Review Your Order' ) . ' • 3i Visa' )
 @section( 'content' )
 	<!-- Mobile Progress Bar -->

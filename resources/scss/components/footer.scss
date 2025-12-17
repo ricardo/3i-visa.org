@@ -6,10 +6,21 @@ footer {
 	margin-top: 4rem;
 	border-top: 1px solid var( --3i-border-color );
 
+	@include respond-to( 'lg' ) {
+		padding-bottom: 7rem;
+	}
+
 	.container {
 		display: flex;
 		flex-direction: column;
 		gap: 2rem;
+	}
+
+	.footer-disclaimer {
+		width: 100%;
+		text-align: center;
+		text-wrap: balance;
+		font-size: .9rem;
 	}
 
 	.footer-links {
@@ -29,7 +40,7 @@ footer {
 		a {
 			color: var( --3i-font-color ) !important;
 			text-decoration: none;
-			font-size: 0.9rem;
+			font-size: .9rem;
 
 			&:hover {
 				color: var( --3i-primary );

@@ -13,6 +13,10 @@
 			</a>
 		</nav>
 
+		<div class="footer-disclaimer">
+			@lang( '3i Visa is a private, independent service agency. We assist travelers by providing support for completing and submitting various travel forms. Our service includes form assistance, customer support, and error checking.' )
+		</div>
+
 		<div class="footer-copyright">
 			&copy; {{ date( 'Y' ) }} 3i Visa. @lang( 'All rights reserved.' )
 		</div>

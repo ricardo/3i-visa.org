@@ -1,4 +1,4 @@
-@extends( 'layouts/main', [ 'footer' => false ] )
+@extends( 'layouts/main' )
 @section( 'title', __( 'Apply for :country :document', [ 'country' => $country_name, 'document' => __($document_type) ] ) . ' • 3i Visa' )
 @section( 'content' )
 	<main class="container">

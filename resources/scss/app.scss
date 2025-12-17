@@ -35,7 +35,8 @@
 // Variables.
 :root {
 	// Fonts.
-	--3i-font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif;
+	--3i-font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif !important;
+	--3i-font-family-sans-serif: 'Figtree', ui-sans-serif, system-ui, sans-serif !important;
 	--3i-font-family-monospace: 'Geist Mono', monospace;
 
 	--3i-font-size: 105%;

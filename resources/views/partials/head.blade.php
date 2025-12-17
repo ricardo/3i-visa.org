@@ -16,7 +16,7 @@
 {{-- Open Graph tags --}}
 <meta property="og:title" content="@yield( 'title', $default_title )">
 <meta property="og:description" content="@yield( 'description', $default_description )">
-<!-- <meta property="og:image" content="{{ asset('images/social-share-image.png') }}"> -->
+<meta property="og:image" content="{{ asset( 'images/og-image.png' ) }}">
 <meta property="og:url" content="{{ url()->current() }}">
 <meta property="og:type" content="website">
 
@@ -33,10 +33,6 @@
 {{-- CSS and JS --}}
 @vite( [ 'resources/scss/app.scss', 'resources/js/app.js' ] )
 @stack( 'page-vite' )
-
-<!-- <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet"> -->
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
