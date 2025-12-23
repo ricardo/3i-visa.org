@@ -7,8 +7,7 @@
 <h2>2. Who We Are</h2>
 <p><strong>Controller:</strong></p>
 <p>
-	Company Name: CL Digital LTD <br>
-	Registered Address: 71-75 Shelton Street, Covent Garden, London, United Kingdom, WC2H 9JQ <br>
+	Registered Address: Rua Professor Algacyr Munhoz Mader – Curitiba, Brazil, 81310-020 <br>
 	Email: support@3i-visa.org
 </p>
 <p>If you have any privacy-related questions, you may contact us at <strong>support@3i-visa.org</strong>.</p>

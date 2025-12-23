@@ -7,8 +7,7 @@
 <h2>2. Quiénes Somos</h2>
 <p><strong>Controlador:</strong></p>
 <p>
-	Nombre de la Empresa: CL Digital LTD <br>
-	Dirección Registrada: 71-75 Shelton Street, Covent Garden, Londres, Reino Unido, WC2H 9JQ <br>
+	Dirección Registrada: Rua Professor Algacyr Munhoz Mader – Curitiba, Brazil, 81310-020 <br>
 	Correo electrónico: support@3i-visa.org
 </p>
 <p>Si tiene alguna pregunta relacionada con la privacidad, puede contactarnos en <strong>support@3i-visa.org</strong>.</p>
